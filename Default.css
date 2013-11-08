@@ -1,0 +1,101 @@
+﻿body 
+{
+    margin:0px; /* The whole page body area has a default margin of 10px, so you have to over-ride this */
+}
+
+/* Table is full width */
+#divContainer 
+{
+    overflow:hidden;
+    background-color:#EEEEEE;
+    width:200px; 
+}
+
+
+/* NOTES */
+/*
+ - You control gaps between cells with the border-spacing property of the table.
+ - td Cells have a default padding of 1px.
+
+*/
+
+
+
+
+
+
+/* Element Settings, Not Classes */
+    
+td,th
+{ 
+    border-width:5px;
+    border-style:solid; 
+    
+    /* margin:10px; */ /* td cells do not have margin property*/
+    padding:3px;
+}    
+
+td
+{ border-color:#FFBBBB; }
+
+th
+{ border-color:#FFBBDD; }
+    
+    
+.tableTestClassLarge 
+{
+    border-collapse:collapse;
+    
+    border-style:solid;
+    border-width:3px;
+    border-color:Black;
+    
+    /* Default is 1px, a nasty gap beteen each cell */
+    border-spacing:0px;
+        
+    /* Gap around the table - express as % so that table size can be a % value also, and table can scale */
+    /* Note: For DynaTables, this MUST be zero, and the margin should go around the containing div element. */
+    margin:0px; 
+    
+    empty-cells:show;
+    white-space:nowrap;
+}
+
+.tdTestClassLarge 
+{
+    /* background-color:White; */ /* IMPORTANT! DO NOT SET A BACKGROUND COLOR FOR CELLS, USE ROWS INSTEAD, FOR SELECTABLE TO WORK */
+    color:Blue;
+    width:100%;
+}
+
+.thTestClassLarge 
+{
+    background-color:Navy;
+    color:Yellow;
+    width:100%;
+}
+
+.trTestClassLarge
+{
+    min-height:30px;
+    background-color:White;
+}
+
+.trTestClassLargeOdd
+{
+    min-height:30px;
+    background-color:#FAC5F2;
+}
+
+.trTestClassLargeEven
+{
+    min-height:30px;
+    background-color:#D3C5FA;
+}
+
+
+.trSelectedTestClassLarge 
+{
+    min-height:30px;
+    background-color:#FCFB8B;
+}
