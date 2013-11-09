@@ -6,9 +6,10 @@
 /* Table is full width */
 #divContainer 
 {
-    overflow:hidden;
+    overflow-y:scroll;
     background-color:#EEEEEE;
-    width:200px; 
+    width:300px; 
+    height:400px;
 }
 
 
@@ -42,12 +43,12 @@ th
 { border-color:#FFBBDD; }
     
     
-.tableTestClassLarge 
+.tableTestClass 
 {
-    border-collapse:collapse;
+    border-collapse:separate;
     
     border-style:solid;
-    border-width:3px;
+    border-width:2px;
     border-color:Black;
     
     /* Default is 1px, a nasty gap beteen each cell */
@@ -59,43 +60,52 @@ th
     
     empty-cells:show;
     white-space:nowrap;
+
+    table-layout:fixed;   
+    width:100% /* IMPORTANT: Required for stacked tables to line up nicely */
 }
 
-.tdTestClassLarge 
+.tdTestClassValue
 {
-    /* background-color:White; */ /* IMPORTANT! DO NOT SET A BACKGROUND COLOR FOR CELLS, USE ROWS INSTEAD, FOR SELECTABLE TO WORK */
+    background-color:White;
     color:Blue;
-    width:100%;
+    display:block; /* IMPORTANT: This is required for ellipsis to work */
+    text-overflow:ellipsis;
+    overflow: hidden;
 }
 
-.thTestClassLarge 
+.tdTestClassKey
+{
+    background-color:#9fa1fc;
+    color:Black;
+    overflow: hidden;
+}
+
+.thTestClass
 {
     background-color:Navy;
     color:Yellow;
-    width:100%;
 }
 
-.trTestClassLarge
+.col1 { width:33%; }
+/* .col2 { width:67%; } */ /* Column 2's width is implied, as there are only two columns */
+
+
+.trTestClassHeader
 {
-    min-height:30px;
-    background-color:White;
+    /* Header rows */
 }
 
-.trTestClassLargeOdd
+.trTestClassData
 {
-    min-height:30px;
-    background-color:#FAC5F2;
+    /* Data rows */
 }
 
-.trTestClassLargeEven
+.buttonRowNavigate 
 {
-    min-height:30px;
-    background-color:#D3C5FA;
 }
 
-
-.trSelectedTestClassLarge 
+.textboxRowNavigate 
 {
-    min-height:30px;
-    background-color:#FCFB8B;
+    width:2em;
 }
