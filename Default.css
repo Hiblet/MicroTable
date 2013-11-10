@@ -57,6 +57,7 @@ th
     /* Gap around the table - express as % so that table size can be a % value also, and table can scale */
     /* Note: For DynaTables, this MUST be zero, and the margin should go around the containing div element. */
     margin:0px; 
+    font-size:smaller;
     
     empty-cells:show;
     white-space:nowrap;

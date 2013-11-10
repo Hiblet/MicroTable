@@ -31,12 +31,6 @@ kawasu.microtable.config = new Object();
 kawasu.microtable.config.STACK = 1;
 kawasu.microtable.config.VERTICAL = 0;
 
-/*
-kawasu.microtable.config.sTableHeaderPrefix = "table_";
-kawasu.microtable.config.sTableHeaderSuffix = "_Header";
-*/
-
-
 
 
 
@@ -44,7 +38,7 @@ kawasu.microtable.config.sTableHeaderSuffix = "_Header";
 // ENTRY POINT
 //
 
-kawasu.microtable.build = function (arrData, styleDefn, sTableID, nViewState) {
+kawasu.microtable.build = function (arrData, styleDefn, sTableID, sItemName, nViewState) {
     var prefix = "kawasu.microtable.build() - ";
     console.log(prefix + "Entering");
 
@@ -54,6 +48,7 @@ kawasu.microtable.build = function (arrData, styleDefn, sTableID, nViewState) {
     kawasu.microtable[sTableID]["arrData"] = arrData;
     kawasu.microtable[sTableID]["styleDefn"] = styleDefn;
     kawasu.microtable[sTableID]["viewState"] = nViewState;
+    kawasu.microtable[sTableID]["itemName"] = sItemName;
 
 
     // Header object is created by walking the inbound data and 
@@ -67,29 +62,19 @@ kawasu.microtable.build = function (arrData, styleDefn, sTableID, nViewState) {
         console.log(prefix + "ERROR: Failed to create raw tables.");
         return;
     }
-    
-    kawasu.microtable.applyViewState(sTableID);
-
+    else {
+        kawasu.microtable.applyViewState(sTableID);
+        console.log(prefix + "Exiting");
+        return kawasu.microtable[sTableID]["rawTables"]
+    }
 
     // DIAGNOSTICS
     // Iterate returned array and display tables
-    for (var i = 0; i < kawasu.microtable[sTableID]["rawTables"].length; ++i) {
-        (document.getElementById("divContainer")).appendChild(kawasu.microtable[sTableID]["rawTables"][i]);
-    }
+    //for (var i = 0; i < kawasu.microtable[sTableID]["rawTables"].length; ++i) {
+    //    (document.getElementById("divContainer")).appendChild(kawasu.microtable[sTableID]["rawTables"][i]);
+    //}
     // END DIAGNOSTICS
 
-
-    /*
-    // Check that rawtable is defined before attempting next step
-    if (fc.utils.isValidVar(rawTables)) {
-    console.log(prefix + "CHECK: rawTables have been created...");
-    //return kawasu.microtable.buildScrollingTable(rawTable, nRowsToShow, bExtendLastColOverScrollbar);
-    }
-    // implicit else
-    console.log(prefix + "ERROR: Failed to create rawTable from arrData array of JSON Objects passed in.");
-    */
-
-    console.log(prefix + "Exiting");
 }
 
 
@@ -132,6 +117,7 @@ kawasu.microtable.buildRawTables = function (sTableID) {
 
     var arrData = kawasu.microtable[sTableID]["arrData"];
     var header = kawasu.microtable[sTableID]["header"];
+    var sItemName = kawasu.microtable[sTableID]["itemName"];
     var styleDefn = kawasu.microtable[sTableID]["styleDefn"];
     kawasu.microtable[sTableID]["indexCurrentRow"] = 1;
 
@@ -164,7 +150,8 @@ kawasu.microtable.buildRawTables = function (sTableID) {
 
     // Make the textbox control for row navigation
     var labelRowNavigate = document.createElement("label");
-    labelRowNavigate.innerHTML = "Row: ";
+    labelRowNavigate.innerHTML = sItemName;
+    labelRowNavigate.title = "Items: " + arrData.length ;
     th1Control.appendChild(labelRowNavigate);
     var textboxRowNavigate = document.createElement("input");
     textboxRowNavigate.type = "textbox";
@@ -291,6 +278,7 @@ kawasu.microtable.buildRawTables = function (sTableID) {
                 // Check the data element to see if this key has a value
                 if (obj.hasOwnProperty(prop)) {
                     fc.utils.textContent(tdValue, obj[prop]);
+                    tdValue.title = obj[prop]; // Tooltip
                 }
                 else {
                     tdValue.innerHTML = kawasu.microtable.sEmptyString;
@@ -312,6 +300,32 @@ kawasu.microtable.buildRawTables = function (sTableID) {
     console.log(prefix + "Exiting");
 }
 
+kawasu.microtable.rebuild = function (sTableID) {
+    var prefix = "kawasu.microtable.rebuild() - ";
+    console.log(prefix + "Entering");
+
+    // This fn assumes that the underlying data has been changed, and that we
+    // need to resynchronise the tables with the data.  Rather than try to 
+    // figure out what has changed, we drop the tables and rebuild.
+
+    // Assumes: sItemName remains the same.
+    //          The reference to arrData is still valid.
+
+    // Build first, and then swap new built data into place
+    var header_rebuild = kawasu.microtable.buildHeaderData(kawasu.microtable[sTableID]["arrData"]);
+    var rawTables_rebuild = kawasu.microtable.buildRawTables(sTableID);
+
+    // Swap in
+    kawasu.microtable[sTableID]["header"] = header_rebuild;
+    kawasu.microtable[sTableID]["rawTables"] = rawTables_rebuild;
+
+    // Apply view state
+    kawasu.microtable.applyViewState(sTableID);
+
+    console.log(prefix + "Exiting");
+
+    return kawasu.microtable[sTableID]["rawTables"];
+}
 
 kawasu.microtable.applyViewState = function (sTableID) {
     var prefix = "kawasu.microtable.applyViewState() - ";
@@ -368,7 +382,7 @@ kawasu.microtable.setViewStateVertical = function (rawTables, indexCurrentRow) {
     // Hide the control table.
     // Show all the row tables sequentially.  
     // Show the row's native header.
-    //rawTables[0].style.visibility = "hidden";
+
     kawasu.microtable.setElementVis(rawTables[0], false);
 
     for (var i = 1; i < rawTables.length; ++i) {
