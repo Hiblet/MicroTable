@@ -42,15 +42,37 @@ kawasu.orders.init = function () {
     styleDefn["buttonRowNavigate"] = "buttonRowNavigate";
     styleDefn["textboxRowNavigate"] = "textboxRowNavigate";
 
+    var divContainer = document.getElementById("divContainer");
 
     // Microtable testing
     var myMicroTable = kawasu.microtable.build(
         arrData,
         styleDefn,
         "myMicroTable",
+        "Order: ",
         kawasu.microtable.config.STACK);
 
-    //$("#divContainer").append(myMicroTable);
+    if (fc.utils.isValidVar(myMicroTable)) {
+        divContainer.appendChild(myMicroTable);
+    }
+
+    // TEST:
+    // Add some data to arrData, and rebuild the tables
+    // Give it a new field.
+    var obj = new Object();
+    obj["Contract"] = "Mutton";
+    obj["Flock"] = "Mr. Hibbert's Flock";
+    arrData.push(obj);
+
+
+    var myMicroTableRebuilt = kawasu.microtable.rebuild("myMicroTable");
+    //$("#divContainer").remove(myMicroTable); // Drop tables from DOM
+    //$("#divContainer").append(myMicroTableRebuilt);
+
+    divContainer.removeChild(myMicroTable);
+    divContainer.appendChild(myMicroTableRebuilt);
+
+    // END TEST:
 
     console.log(prefix + "Exiting");
 }

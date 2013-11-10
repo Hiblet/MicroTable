@@ -5,7 +5,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head runat="server">
 
-    <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+    <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script> 
     <script type="text/javascript" src="<%= ResolveClientUrl("~/js/FCUtils.js") %>"></script>
     <script type="text/javascript" src="<%= ResolveClientUrl("~/js/MicroTable.js") %>"></script>
     <script type="text/javascript" src="<%= ResolveClientUrl("~/js/Default.js") %>"></script>
