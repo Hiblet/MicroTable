@@ -50,7 +50,8 @@ kawasu.orders.init = function () {
         styleDefn,
         "myMicroTable",
         "Order: ",
-        kawasu.microtable.config.STACK);
+        //kawasu.microtable.config.STACK);
+        kawasu.microtable.config.VERTICAL);
 
     if (fc.utils.isValidVar(myMicroTable)) {
         divContainer.appendChild(myMicroTable);
@@ -69,7 +70,8 @@ kawasu.orders.init = function () {
     //$("#divContainer").remove(myMicroTable); // Drop tables from DOM
     //$("#divContainer").append(myMicroTableRebuilt);
 
-    divContainer.removeChild(myMicroTable);
+    //divContainer.removeChild(myMicroTable);
+    while (divContainer.lastChild) { divContainer.removeChild(divContainer.lastChild); }
     divContainer.appendChild(myMicroTableRebuilt);
 
     // END TEST:

@@ -56,16 +56,16 @@ kawasu.microtable.build = function (arrData, styleDefn, sTableID, sItemName, nVi
     // property on the objects in the arrData array.
     kawasu.microtable[sTableID]["header"] = kawasu.microtable.buildHeaderData(arrData);
 
-    kawasu.microtable[sTableID]["rawTables"] = kawasu.microtable.buildRawTables(sTableID); // returns array of tables
+    var rawTables = kawasu.microtable.buildRawTables(sTableID); // returns nodelist of tables
 
-    if (fc.utils.isInvalidVar(kawasu.microtable[sTableID]["rawTables"])) {
+    if (fc.utils.isInvalidVar(rawTables)) {
         console.log(prefix + "ERROR: Failed to create raw tables.");
         return;
     }
     else {
-        kawasu.microtable.applyViewState(sTableID);
+        kawasu.microtable.applyViewState(sTableID, rawTables);
         console.log(prefix + "Exiting");
-        return kawasu.microtable[sTableID]["rawTables"]
+        return rawTables;
     }
 
     // DIAGNOSTICS
@@ -121,7 +121,7 @@ kawasu.microtable.buildRawTables = function (sTableID) {
     var styleDefn = kawasu.microtable[sTableID]["styleDefn"];
     kawasu.microtable[sTableID]["indexCurrentRow"] = 1;
 
-    var rawTables = [];
+    var rawTables = document.createDocumentFragment();
 
     var classTable = styleDefn["tableClass"] || "";
     var classRowHeader = styleDefn["trClassHeader"] || "";
@@ -151,7 +151,7 @@ kawasu.microtable.buildRawTables = function (sTableID) {
     // Make the textbox control for row navigation
     var labelRowNavigate = document.createElement("label");
     labelRowNavigate.innerHTML = sItemName;
-    labelRowNavigate.title = "Items: " + arrData.length ;
+    labelRowNavigate.title = "Items: " + arrData.length;
     th1Control.appendChild(labelRowNavigate);
     var textboxRowNavigate = document.createElement("input");
     textboxRowNavigate.type = "textbox";
@@ -218,7 +218,8 @@ kawasu.microtable.buildRawTables = function (sTableID) {
 
     tableControl.appendChild(trHeaderControl);
 
-    rawTables.push(tableControl);
+    //rawTables.push(tableControl);
+    rawTables.appendChild(tableControl);
 
 
 
@@ -291,7 +292,8 @@ kawasu.microtable.buildRawTables = function (sTableID) {
 
         } // end of iteration of data object's properties (rows for each object as a table)
 
-        rawTables.push(table);
+        //rawTables.push(table);
+        rawTables.appendChild(table);
 
     } // end of iteration of data object array (table completed for this object)
 
@@ -312,27 +314,25 @@ kawasu.microtable.rebuild = function (sTableID) {
     //          The reference to arrData is still valid.
 
     // Build first, and then swap new built data into place
-    var header_rebuild = kawasu.microtable.buildHeaderData(kawasu.microtable[sTableID]["arrData"]);
+    kawasu.microtable[sTableID]["header"] = kawasu.microtable.buildHeaderData(kawasu.microtable[sTableID]["arrData"]);
     var rawTables_rebuild = kawasu.microtable.buildRawTables(sTableID);
 
     // Swap in
-    kawasu.microtable[sTableID]["header"] = header_rebuild;
-    kawasu.microtable[sTableID]["rawTables"] = rawTables_rebuild;
 
     // Apply view state
-    kawasu.microtable.applyViewState(sTableID);
+    kawasu.microtable.applyViewState(sTableID,rawTables_rebuild);
 
     console.log(prefix + "Exiting");
 
-    return kawasu.microtable[sTableID]["rawTables"];
+    return rawTables_rebuild;
 }
 
-kawasu.microtable.applyViewState = function (sTableID) {
+kawasu.microtable.applyViewState = function (sTableID,rawTables) {
     var prefix = "kawasu.microtable.applyViewState() - ";
     console.log(prefix + "Entering");
 
     var nViewState = kawasu.microtable[sTableID]["viewState"];
-    var rawTables = kawasu.microtable[sTableID]["rawTables"];
+    //var rawTables = kawasu.microtable[sTableID]["rawTables"];
     var indexCurrentRow = kawasu.microtable[sTableID]["indexCurrentRow"];
 
     switch (nViewState) {
@@ -360,15 +360,18 @@ kawasu.microtable.setViewStateStack = function (rawTables, indexCurrentRow) {
     // Show the currently selected row only.
     // Hide the row's native header
 
-    kawasu.microtable.setElementVis(rawTables[0], true);
+    var tableControl = rawTables.childNodes.item(0)
+    kawasu.microtable.setElementVis(tableControl, true);
 
-    for (var i = 1; i < rawTables.length; ++i) {
+    var nodeListLength = rawTables.childNodes.length;
+    for (var i = 1; i < nodeListLength; ++i) {
+        var table = rawTables.childNodes.item(i);
         if (i == indexCurrentRow) {
-            kawasu.microtable.setElementVis(rawTables[i], true); // Show table
-            kawasu.microtable.setElementVis(rawTables[i].rows[0], false); // Hide native header
+            kawasu.microtable.setElementVis(table, true); // Show table
+            kawasu.microtable.setElementVis(table.rows[0], false); // Hide native header
         }
         else {
-            kawasu.microtable.setElementVis(rawTables[i], false); // Hide table
+            kawasu.microtable.setElementVis(table, false); // Hide table
         }
     }
 
@@ -383,11 +386,14 @@ kawasu.microtable.setViewStateVertical = function (rawTables, indexCurrentRow) {
     // Show all the row tables sequentially.  
     // Show the row's native header.
 
-    kawasu.microtable.setElementVis(rawTables[0], false);
+    var tableControl = rawTables.childNodes.item(0)
+    kawasu.microtable.setElementVis(tableControl, false);
 
-    for (var i = 1; i < rawTables.length; ++i) {
-        kawasu.microtable.setElementVis(rawTables[i], true); // Show table
-        kawasu.microtable.setElementVis(rawTables[i].rows[0], true); // Show native header
+    var nodeListLength = rawTables.childNodes.length;
+    for (var i = 1; i < nodeListLength; ++i) {
+        var table = rawTables.childNodes.item(i);
+        kawasu.microtable.setElementVis(table, true); // Show table
+        kawasu.microtable.setElementVis(table.rows[0], true); // Show native header
     }
 
     console.log(prefix + "Exiting");
@@ -439,14 +445,17 @@ kawasu.microtable.textboxRowNavigate_onChange = function (event) {
     console.log(prefix + "INFO: Value >" + nValue + "<");
 
     // Get ref to the array of raw tables...
-    var rawTables = kawasu.microtable[sTableID]["rawTables"];
+    //var rawTables = kawasu.microtable[sTableID]["rawTables"];
+    var tableControl = document.getElementById(sTableID + "_" + "Control");
+    var rawTables = tableControl.parentNode;
+    var rawTablesLength = rawTables.childNodes.length;
 
     var nCleanValue = nValue;
     if (nValue < 1) {
         nCleanValue = 1; // Should never happen
     }
-    else if (nValue > (rawTables.length - 1)) {
-        nCleanValue = (rawTables.length - 1);
+    else if (nValue > (rawTablesLength - 1)) {
+        nCleanValue = (rawTablesLength - 1);
     }
 
     // If we have had to clean the value, set the textbox to this cleaned value
@@ -479,7 +488,11 @@ kawasu.microtable.btnRowNavigate_onClick = function () {
     var sBtnName = arraySplit[1];
 
     // Get ref to the array of raw tables...
-    var rawTables = kawasu.microtable[sTableID]["rawTables"];
+    //var rawTables = kawasu.microtable[sTableID]["rawTables"];
+    var tableControl = document.getElementById(sTableID + "_" + "Control");
+    var rawTables = tableControl.parentNode;
+    var rawTablesLength = rawTables.childNodes.length;
+
     var indexCurrentRow = kawasu.microtable[sTableID]["indexCurrentRow"];
 
     // Get a ref to the textbox
@@ -495,9 +508,9 @@ kawasu.microtable.btnRowNavigate_onClick = function () {
             }
             break;
         case "btnRowLast":
-            if (indexCurrentRow != (rawTables.length - 1)) {
-                textbox.value = (rawTables.length - 1);
-                kawasu.microtable[sTableID]["indexCurrentRow"] = (rawTables.length - 1);
+            if (indexCurrentRow != (rawTablesLength - 1)) {
+                textbox.value = (rawTablesLength - 1);
+                kawasu.microtable[sTableID]["indexCurrentRow"] = (rawTablesLength - 1);
                 kawasu.microtable.setViewStateStack(rawTables, kawasu.microtable[sTableID]["indexCurrentRow"]);
             }
             break;
@@ -510,7 +523,7 @@ kawasu.microtable.btnRowNavigate_onClick = function () {
             }
             break;
         case "btnRowNext":
-            if (indexCurrentRow != (rawTables.length - 1)) {
+            if (indexCurrentRow != (rawTablesLength - 1)) {
                 var nextValue = indexCurrentRow + 1;
                 textbox.value = nextValue;
                 kawasu.microtable[sTableID]["indexCurrentRow"] = nextValue;
