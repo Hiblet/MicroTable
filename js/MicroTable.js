@@ -157,7 +157,8 @@ kawasu.microtable.buildRawTables = function (sTableID) {
     var tableControl = document.createElement("table");
     var classTable = styleDefn["tableClass"] || "";
     tableControl.className = classTable;
-    tableControl.id = sTableID + "_Control";
+    //tableControl.id = sTableID + "_Control";
+    tableControl.id = kawasu.microtable.getTableId(sTableID, 0);
 
     var trHeaderControl = document.createElement("tr");
     trHeaderControl.className = classRowHeader;
@@ -250,49 +251,9 @@ kawasu.microtable.buildRawTables = function (sTableID) {
 
     kawasu.microtable.addRow(sTableID, tableControl, true, kawasu.microtable.getItemText(sItemName, 0)); // Native header row "Row:0"
 
-    /*
-    // Make zero header
-    var trZeroHeader = document.createElement("tr");
-    trZeroHeader.className = classRowHeader;
-
-    // Make zero header cells
-    var thZero1 = document.createElement("th");
-    fc.utils.textContent(thZero1, kawasu.microtable.getItemText(sItemName, 0));
-    thZero1.className = classHeaderCell + " " + classCol1;
-    trZeroHeader.appendChild(thZero1);
-
-    var thZero2 = document.createElement("th");
-    thZero2.innerHTML = kawasu.microtable.config.sEmptyStringHtml;
-    thZero2.className = classHeaderCell;
-    trZeroHeader.appendChild(thZero2);
-    
-    // Add the zero header row to the table
-    tableControl.appendChild(trHeader);
-    */
-
     // Add the minimum number of blank rows
     for (var j = 0; j < nRowsMinimum; ++j) {
-
         kawasu.microtable.addRow(sTableID, tableControl, false); // bHeader=false ie "td", not "th"
-
-        /*
-        var trZeroData = document.createElement("tr");
-        trZeroData.className = classRowData;
-
-        // Create the key and value cells
-        var tdZeroKey = document.createElement("td");
-        var tdZeroValue = document.createElement("td");
-        tdZeroKey.className = classCellKey + " " + classCol1;
-        tdZeroValue.className = classCellValue;
-
-        // Set the blank cells
-        tdZeroKey.innerHTML = kawasu.microtable.config.sEmptyStringHtml;
-        tdZeroValue.innerHTML = kawasu.microtable.config.sEmptyStringHtml;
-
-        trZeroData.appendChild(tdZeroKey);
-        trZeroData.appendChild(tdZeroValue);
-        tableControl.appendChild(trZeroData);
-        */
     }
 
     rawTables.appendChild(tableControl);
@@ -306,14 +267,13 @@ kawasu.microtable.buildRawTables = function (sTableID) {
 
         var obj = arrData[i];
 
-
         // Make table
         var table = document.createElement("table");
         table.className = classTable;
-        table.id = kawasu.microtable.getTableId(sTableID, i);
+        table.id = kawasu.microtable.getTableId(sTableID, i+1);
 
         // Add native header
-        var trHeader = kawasu.microtable.addRow(sTableID, table, true, kawasu.microtable.getItemText(sItemName, i));
+        var trHeader = kawasu.microtable.addRow(sTableID, table, true, kawasu.microtable.getItemText(sItemName, i+1));
 
         // Add a checkbox to the native header 2nd cell
         var checkboxSelect = document.createElement("input");
@@ -323,61 +283,12 @@ kawasu.microtable.buildRawTables = function (sTableID) {
         fc.utils.addEvent(checkboxSelect, "click", kawasu.microtable.checkboxSelect_onClick);
         trHeader.cells[1].appendChild(checkboxSelect);
 
-        /*
-        // Make header
-        var trHeader = document.createElement("tr");
-        trHeader.className = classRowHeader;
-
-
-        // Make header cells
-        var th1 = document.createElement("th");
-        fc.utils.textContent(th1, kawasu.microtable.getItemText(sItemName, i));
-        th1.className = classHeaderCell + " " + classCol1;
-        trHeader.appendChild(th1);
-
-        var th2 = document.createElement("th");
-        th2.innerHTML = kawasu.microtable.config.sEmptyStringHtml;
-        th2.className = classHeaderCell;
-        trHeader.appendChild(th2);
-
-
-        // Add the header row to the table
-        table.appendChild(trHeader);
-        */
 
         // Iterate the header object, and add one row per header element.
         // Each header element is a key, and there should be a value in the data element.
         for (var prop in header) {
             if (header.hasOwnProperty(prop)) {
-
                 kawasu.microtable.addRow(sTableID, table, false, prop, obj[prop]);
-                /*
-                // Create a row for this key-value pair
-                var trData = document.createElement("tr");
-                trData.className = classRowData;
-
-                // Create the key and value cells
-                var tdKey = document.createElement("td");
-                var tdValue = document.createElement("td");
-                tdKey.className = classCellKey + " " + classCol1;
-                tdValue.className = classCellValue;
-
-                // Set the key cell
-                fc.utils.textContent(tdKey, prop);
-
-                // Check the data element to see if this key has a value
-                if (obj.hasOwnProperty(prop)) {
-                fc.utils.textContent(tdValue, obj[prop]);
-                tdValue.title = obj[prop]; // Tooltip
-                }
-                else {
-                tdValue.innerHTML = kawasu.microtable.config.sEmptyStringHtml;
-                }
-
-                trData.appendChild(tdKey);
-                trData.appendChild(tdValue);
-                table.appendChild(trData);
-                */
             }
 
         } // end of iteration of data object's properties (rows for each object as a table)
@@ -576,16 +487,8 @@ kawasu.microtable.setViewStateVertical = function (rawTables, indexCurrentRow) {
 
     // Hide the control table
     kawasu.microtable.setElementVis(tableControl, false);
-    /*
-    kawasu.microtable.setElementVis(tableControl.rows[0], false); // Hide the control header
-    kawasu.microtable.setElementVis(tableControl.rows[1], false); // Hide the native header
 
-    for (var j = 2; j < tableControl.rows.length; ++j) {
-    kawasu.microtable.setElementVis(tableControl.rows[j], false); // Hide the padding rows         
-    }
-    */
-
-    // Show the data rows
+    // Show the data rowTables
     for (var i = 1; i < nodeListLength; ++i) {
         var table = rawTables.children[i];
         kawasu.microtable.setElementVis(table, true); // Show table
@@ -654,7 +557,8 @@ kawasu.microtable.textboxRowNavigate_onChange = function (event) {
 
     // Get ref to the array of raw tables...
     //var rawTables = kawasu.microtable[sTableID]["rawTables"];
-    var tableControl = document.getElementById(sTableID + "_" + "Control");
+    var tableControlId = kawasu.microtable.getTableId(sTableID, 0);
+    var tableControl = document.getElementById(tableControlId);
     var rawTables = tableControl.parentNode;
     var rawTablesLength = rawTables.children.length;
 
@@ -696,7 +600,8 @@ kawasu.microtable.btnRowNavigate_onClick = function () {
     var sBtnName = arraySplit[1];
 
     // Get ref to the array of raw tables...
-    var tableControl = document.getElementById(sTableID + "_" + "Control");
+    var tableControlId = kawasu.microtable.getTableId(sTableID, 0);
+    var tableControl = document.getElementById(tableControlId);
     var rawTables = tableControl.parentNode;
     var rawTablesLength = rawTables.children.length;
 
@@ -784,11 +689,11 @@ kawasu.microtable.checkboxSelect_onClick = function (event) {
         var indexCurrentRow = kawasu.microtable[sTableID]["indexCurrentRow"];
 
         // Push the state of the checkbox to the rowTable checkbox
-        kawasu.microtable.pushSelectStateControlToRow(sTableID, indexCurrentRow - 1, controlCheckbox.checked);
+        kawasu.microtable.pushSelectStateControlToRow(sTableID, indexCurrentRow, controlCheckbox.checked);
 
         // Enforce Single Select if applicable
         if (!bMultiSelect) {
-            kawasu.microtable.setSingleSelect(sTableID, indexCurrentRow - 1);
+            kawasu.microtable.setSingleSelect(sTableID, indexCurrentRow);
         }
 
     }
@@ -880,28 +785,6 @@ kawasu.microtable.itemDelete = function (sTableID, nIndexRowToDelete, bDeleteSou
 }
 */
 
-/*
-kawasu.microtable.itemBlank = function (sTableID, nIndexRowToBlank) {
-    var prefix = "kawasu.microtable.itemBlank() - ";
-    console.log(prefix + "Entering");
-
-    // Client app has requested that a row/item be blanked.
-    // Argument is the zero based row index.
-
-    var tableId = kawasu.microtable.getTableId(sTableID, nIndexRowToBlank);
-    var table = document.getElementById(tableId);
-
-    // Iterate the rows, set value cells to nbsp
-    for (var i = 1; i < table.rows.length; ++i) {
-        var row = table.rows[i];
-        // First cell is the key, second cell is the value
-        var cellValue = row.cells[1];
-        cellValue.innerHTML = kawasu.microtable.config.sEmptyStringHtml;
-    }
-
-    console.log(prefix + "Exiting");
-}
-*/
 
 //
 ///////////////////////////////////////////////////////////////////////////////
@@ -917,7 +800,7 @@ kawasu.microtable.getTableId = function (sTableID, nIndex) {
 }
 
 kawasu.microtable.getItemText = function (sItemName, nIndex) {
-    return sItemName + (nIndex + 1).toString();
+    return sItemName + nIndex.toString();
 }
 
 kawasu.microtable.countHeaders = function (header) {
@@ -934,7 +817,7 @@ kawasu.microtable.getRawTables = function (sTableID) {
     // Once the raw tables have been created, they get attached to the main doc,
     // and we lose track of them.  To find the owner, get the control and get
     // it's parent.  Always use 'children' not 'childnodes' to access siblings.
-    var controlTableId = sTableID + "_Control";
+    var controlTableId = kawasu.microtable.getTableId(sTableID, 0);
     var controlTable = document.getElementById(controlTableId);
     return controlTable.parentNode;
 }
@@ -946,9 +829,10 @@ kawasu.microtable.getCheckboxFromTable = function (table) {
     var tableId = table.id;
     var arraySplit = tableId.split("_");
     var sTableID = arraySplit[0];
+    var zeroIndex = parseInt(arraySplit[1]);
     var checkboxId = "";
 
-    if (arraySplit[1] == "Control") {
+    if (zeroIndex == 0) {
         // Control
         var checkbox = table.rows[0].cells[1].children[4]; // 5th control
         return checkbox;
@@ -965,7 +849,7 @@ kawasu.microtable.pushSelectStateControlToRow = function (sTableID, nSelectedInd
     console.log(prefix + "Entering");
 
     var rawTables = kawasu.microtable.getRawTables(sTableID);
-    var table = rawTables.children[nSelectedIndex + 1];
+    var table = rawTables.children[nSelectedIndex];
     var checkbox = kawasu.microtable.getCheckboxFromTable(table);
     checkbox.checked = bState;
 
@@ -986,7 +870,7 @@ kawasu.microtable.setSingleSelect = function (sTableID, nSelectedIndex) {
     for (var i = 1; i < nodeListLength; ++i) {
         var table = rawTables.children[i];
         var checkbox = kawasu.microtable.getCheckboxFromTable(table);
-        if (i == (nSelectedIndex + 1)) {
+        if (i == nSelectedIndex) {
             checkbox.checked = true;
         }
         else {
