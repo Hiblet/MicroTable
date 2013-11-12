@@ -8,7 +8,7 @@
 {
     overflow-y:scroll;
     background-color:#EEEEEE;
-    width:300px; 
+    width:350px; 
     height:400px;
 }
 
@@ -109,4 +109,8 @@ th
 .textboxRowNavigate 
 {
     width:2em;
+}
+
+.checkboxSelect
+{
 }
