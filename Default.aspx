@@ -18,6 +18,12 @@
     <form id="form1" runat="server">
     <div>
     
+        <input type="button" id="btnDeleteItem" value="Delete Item" />
+        <input type="button" id="btnToggleView" value="Toggle View" />
+
+        <br />
+        <br />
+
         <div id="divContainer">
         </div>
 

@@ -23,6 +23,8 @@ kawasu.orders.init = function () {
     var prefix = "kawasu.orders.init() - ";
     console.log(prefix + "Entering");
 
+    kawasu.orders.hookupHandlers();
+
     // BUILD A TEST DATA SET
     var arrData = kawasu.orders.createTestData();
 
@@ -50,14 +52,18 @@ kawasu.orders.init = function () {
         styleDefn,
         "myMicroTable",
         "Order: ",
-        //kawasu.microtable.config.STACK);
-        kawasu.microtable.config.VERTICAL);
+        8,
+        false,
+        kawasu.microtable.config.STACK);
+    //kawasu.microtable.config.VERTICAL);
 
     if (fc.utils.isValidVar(myMicroTable)) {
         divContainer.appendChild(myMicroTable);
     }
 
-    // TEST:
+
+    /*
+    // TEST A:
     // Add some data to arrData, and rebuild the tables
     // Give it a new field.
     var obj = new Object();
@@ -73,8 +79,13 @@ kawasu.orders.init = function () {
     //divContainer.removeChild(myMicroTable);
     while (divContainer.lastChild) { divContainer.removeChild(divContainer.lastChild); }
     divContainer.appendChild(myMicroTableRebuilt);
+    //
+    // END TEST A:
+    */
 
-    // END TEST:
+    // TEST B: Test delete function
+    // kawasu.microtable.itemDelete("myMicroTable", 1); // Delete 2nd row (index 1), "GADGET"
+    // END TEST B
 
     console.log(prefix + "Exiting");
 }
@@ -142,6 +153,46 @@ kawasu.orders.createTestDataLargeRandom = function () {
     }
 
     return array;
+
+    console.log(prefix + "Exiting");
+}
+
+
+
+///////////////////////////////////////////////////////////////////////////////
+// HANDLERS
+//
+
+kawasu.orders.hookupHandlers = function () {
+    
+    var btnDeleteItem = document.getElementById("btnDeleteItem");
+    fc.utils.addEvent(btnDeleteItem, "click", kawasu.orders.btnDeleteItem_onClick);
+
+    var btnToggleView = document.getElementById("btnToggleView");
+    fc.utils.addEvent(btnToggleView, "click", kawasu.orders.btnToggleView_onClick);
+}
+
+kawasu.orders.btnDeleteItem_onClick = function () {
+    var prefix = "kawasu.orders.btnDeleteItem_onClick() - ";
+    console.log(prefix + "Entering");
+
+
+
+    console.log(prefix + "Exiting");
+}
+
+kawasu.orders.btnToggleView_onClick = function () {
+    var prefix = "kawasu.orders.btnToggleView_onClick() - ";
+    console.log(prefix + "Entering");
+
+    var nViewState = kawasu.microtable.viewState("myMicroTable");
+
+    if (nViewState == kawasu.microtable.config.VERTICAL) {
+        kawasu.microtable.viewState("myMicroTable", kawasu.microtable.config.STACK);
+    }
+    else {
+        kawasu.microtable.viewState("myMicroTable", kawasu.microtable.config.VERTICAL);
+    }
 
     console.log(prefix + "Exiting");
 }
