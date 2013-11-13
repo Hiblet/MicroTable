@@ -170,13 +170,16 @@ kawasu.orders.hookupHandlers = function () {
 
     var btnToggleView = document.getElementById("btnToggleView");
     fc.utils.addEvent(btnToggleView, "click", kawasu.orders.btnToggleView_onClick);
+
+    var btnToggleSelect = document.getElementById("btnToggleSelect");
+    fc.utils.addEvent(btnToggleSelect, "click", kawasu.orders.btnToggleSelect_onClick);
 }
 
 kawasu.orders.btnDeleteItem_onClick = function () {
     var prefix = "kawasu.orders.btnDeleteItem_onClick() - ";
     console.log(prefix + "Entering");
 
-
+    kawasu.microtable.deleteSelected("myMicroTable", true);
 
     console.log(prefix + "Exiting");
 }
@@ -194,6 +197,17 @@ kawasu.orders.btnToggleView_onClick = function () {
         kawasu.microtable.viewState("myMicroTable", kawasu.microtable.config.VERTICAL);
     }
 
+    console.log(prefix + "Exiting");
+}
+
+kawasu.orders.btnToggleSelect_onClick = function () {
+    var prefix = "kawasu.orders.btnToggleSelect_onClick() - ";
+    console.log(prefix + "Entering");
+
+    kawasu.microtable.multiSelect("myMicroTable") ?
+        kawasu.microtable.multiSelect("myMicroTable", false) : 
+        kawasu.microtable.multiSelect("myMicroTable", true);
+        
     console.log(prefix + "Exiting");
 }
 
