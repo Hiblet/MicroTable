@@ -10,6 +10,7 @@
     <script type="text/javascript" src="<%= ResolveClientUrl("~/js/MicroTable.js") %>"></script>
     <script type="text/javascript" src="<%= ResolveClientUrl("~/js/Default.js") %>"></script>
 
+
     <link rel="Stylesheet" type="text/css" href="<%= ResolveClientUrl("~/Default.css") %>" />    
 
     <title>MicroTable Experiment</title>
@@ -21,7 +22,10 @@
         <input type="button" id="btnDeleteItem" value="Delete Item" />
         <input type="button" id="btnToggleView" value="Toggle View" />
         <input type="button" id="btnToggleSelect" value="Toggle Select" />
-
+        <br />
+        <input type="button" id="btnSelectAll" value="Select All" />
+        <input type="button" id="btnDeselectAll" value="Deselect All" />
+        
         <br />
         <br />
 
