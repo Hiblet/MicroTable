@@ -179,6 +179,12 @@ kawasu.orders.hookupHandlers = function () {
 
     var btnDeselectAll = document.getElementById("btnDeselectAll");
     fc.utils.addEvent(btnDeselectAll, "click", kawasu.orders.btnDeselectAll_onClick);
+
+    var btnToggleExpandable = document.getElementById("btnToggleExpandable");
+    fc.utils.addEvent(btnToggleExpandable, "click", kawasu.orders.btnToggleExpandable_onClick);
+
+    var btnToggleMultiSingleExp = document.getElementById("btnToggleMultiSingleExp");
+    fc.utils.addEvent(btnToggleMultiSingleExp, "click", kawasu.orders.btnToggleMultiSingleExp_onClick);
 }
 
 kawasu.orders.btnDeleteItem_onClick = function () {
@@ -231,6 +237,32 @@ kawasu.orders.btnDeselectAll_onClick = function () {
     console.log(prefix + "Entering");
 
     kawasu.microtable.setSelectAll("myMicroTable", false);
+
+    console.log(prefix + "Exiting");
+}
+
+kawasu.orders.btnToggleExpandable_onClick = function () {
+    var prefix = "kawasu.orders.btnToggleExpandable_onClick() - ";
+    console.log(prefix + "Entering");
+
+    kawasu.microtable.expandable("myMicroTable") ?
+        kawasu.microtable.expandable("myMicroTable", false) :
+        kawasu.microtable.expandable("myMicroTable", true);
+
+    kawasu.microtable.refreshView("myMicroTable");
+
+    console.log(prefix + "Exiting");
+}
+
+kawasu.orders.btnToggleMultiSingleExp_onClick = function () {
+    var prefix = "kawasu.orders.btnToggleMultiSingleExp_onClick() - ";
+    console.log(prefix + "Entering");
+
+    kawasu.microtable.multiExpand("myMicroTable") ?
+        kawasu.microtable.multiExpand("myMicroTable", false) :
+        kawasu.microtable.multiExpand("myMicroTable", true);
+
+    kawasu.microtable.refreshView("myMicroTable");
 
     console.log(prefix + "Exiting");
 }
