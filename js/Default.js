@@ -173,6 +173,12 @@ kawasu.orders.hookupHandlers = function () {
 
     var btnToggleSelect = document.getElementById("btnToggleSelect");
     fc.utils.addEvent(btnToggleSelect, "click", kawasu.orders.btnToggleSelect_onClick);
+
+    var btnSelectAll = document.getElementById("btnSelectAll");
+    fc.utils.addEvent(btnSelectAll, "click", kawasu.orders.btnSelectAll_onClick);
+
+    var btnDeselectAll = document.getElementById("btnDeselectAll");
+    fc.utils.addEvent(btnDeselectAll, "click", kawasu.orders.btnDeselectAll_onClick);
 }
 
 kawasu.orders.btnDeleteItem_onClick = function () {
@@ -211,3 +217,20 @@ kawasu.orders.btnToggleSelect_onClick = function () {
     console.log(prefix + "Exiting");
 }
 
+kawasu.orders.btnSelectAll_onClick = function () {
+    var prefix = "kawasu.orders.btnSelectAll_onClick() - ";
+    console.log(prefix + "Entering");
+
+    kawasu.microtable.setSelectAll("myMicroTable", true);
+
+    console.log(prefix + "Exiting");
+}
+
+kawasu.orders.btnDeselectAll_onClick = function () {
+    var prefix = "kawasu.orders.btnDeselectAll_onClick() - ";
+    console.log(prefix + "Entering");
+
+    kawasu.microtable.setSelectAll("myMicroTable", false);
+
+    console.log(prefix + "Exiting");
+}

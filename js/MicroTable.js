@@ -672,7 +672,6 @@ kawasu.microtable.checkboxSelect_onClick = function (event) {
 
     // User has clicked on a checkbox for either the Control table or a Row table
 
-
     var checkboxId = event.target.id;
     var tableId = kawasu.microtable.getTableIdFromControlId(checkboxId);
     console.log(prefix + "INFO: checkboxId >" + checkboxId + "<");
@@ -813,6 +812,35 @@ kawasu.microtable.itemsDelete = function (sTableID, arrRowsToDelete, bDeleteSour
 
     // Update the tooltip
     kawasu.microtable.setLabelTooltipRowCount(sTableID);
+
+    console.log(prefix + "Exiting");
+}
+
+kawasu.microtable.setSelectAll = function (sTableID, bSelect) {
+    var prefix = "kawasu.microtable.setSelectAll() - ";
+    console.log(prefix + "Entering");
+
+    var bMultiSelect = kawasu.microtable[sTableID]["bMultiSelect"];
+    if (bMultiSelect == false) {
+        console.log(prefix + "WARNING: Cannot select all in Single Select Mode, no action will be taken.");
+        console.log(prefix + "Exiting");
+        return;
+    }
+
+    // Default syntax - defaults to true, select all.
+    bSelect = (typeof bSelect !== 'undefined') ? bSelect : true;
+
+    var rawTables = kawasu.microtable.getRawTables(sTableID);
+    var nodeListLength = rawTables.children.length;
+
+    // Iterate tables, set select state.  
+    // Note: Control table case is handled by intelligence in getCheckboxFromTable()
+    //       because this fn is able to retrieve the checkbox from the control table too.
+    for (var i = 0; i < nodeListLength; ++i) {
+        var table = rawTables.children[i];
+        var checkbox = kawasu.microtable.getCheckboxFromTable(table);
+        checkbox.checked = bSelect;
+    }
 
     console.log(prefix + "Exiting");
 }
