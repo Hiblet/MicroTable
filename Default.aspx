@@ -25,6 +25,9 @@
         <br />
         <input type="button" id="btnSelectAll" value="Select All" />
         <input type="button" id="btnDeselectAll" value="Deselect All" />
+        <input type="button" id="btnToggleExpandable" value="Toggle Expandable" />
+        <input type="button" id="btnToggleMultiSingleExp" value="Toggle Multi-Single Exp" />
+
         
         <br />
         <br />
