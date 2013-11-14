@@ -61,6 +61,10 @@ kawasu.orders.init = function () {
         divContainer.appendChild(myMicroTable);
     }
 
+    // Update the buttons to show current state
+    kawasu.orders.btnToggleExpandable_setBtnText();
+    kawasu.orders.btnToggleMultiSingleExp_setBtnText();
+    kawasu.orders.btnToggleSelect_setBtnText();
 
     /*
     // TEST A:
@@ -216,12 +220,25 @@ kawasu.orders.btnToggleSelect_onClick = function () {
     var prefix = "kawasu.orders.btnToggleSelect_onClick() - ";
     console.log(prefix + "Entering");
 
-    kawasu.microtable.multiSelect("myMicroTable") ?
-        kawasu.microtable.multiSelect("myMicroTable", false) : 
+    var bState = kawasu.microtable.multiSelect("myMicroTable") ?
+        kawasu.microtable.multiSelect("myMicroTable", false) :
         kawasu.microtable.multiSelect("myMicroTable", true);
-        
+
+    kawasu.orders.btnToggleSelect_setBtnText(bState);
+
     console.log(prefix + "Exiting");
 }
+
+kawasu.orders.btnToggleSelect_setBtnText = function (bState) {
+    // If state unknown, go get it...
+    bState = (typeof bState === 'undefined') ?
+        kawasu.microtable.multiSelect("myMicroTable") : bState;
+
+    // Set the button text to reveal current state
+    var btnToggleSelect = document.getElementById("btnToggleSelect");
+    btnToggleSelect.value = "Toggle MultiSelect:" + (bState ? "T" : "F");
+}
+
 
 kawasu.orders.btnSelectAll_onClick = function () {
     var prefix = "kawasu.orders.btnSelectAll_onClick() - ";
@@ -245,24 +262,44 @@ kawasu.orders.btnToggleExpandable_onClick = function () {
     var prefix = "kawasu.orders.btnToggleExpandable_onClick() - ";
     console.log(prefix + "Entering");
 
-    kawasu.microtable.expandable("myMicroTable") ?
+    var bState = kawasu.microtable.expandable("myMicroTable") ?
         kawasu.microtable.expandable("myMicroTable", false) :
         kawasu.microtable.expandable("myMicroTable", true);
 
-    kawasu.microtable.refreshView("myMicroTable");
+    kawasu.orders.btnToggleExpandable_setBtnText(bState);
 
     console.log(prefix + "Exiting");
+}
+
+kawasu.orders.btnToggleExpandable_setBtnText = function (bState) {
+    // If state unknown, go get it...
+    bState = (typeof bState === 'undefined') ?
+        kawasu.microtable.expandable("myMicroTable") : bState;
+
+    // Set the button text to reveal current state
+    var btnToggleExpandable = document.getElementById("btnToggleExpandable");
+    btnToggleExpandable.value = "Toggle Expandable:" + (bState ? "T" : "F");    
 }
 
 kawasu.orders.btnToggleMultiSingleExp_onClick = function () {
     var prefix = "kawasu.orders.btnToggleMultiSingleExp_onClick() - ";
     console.log(prefix + "Entering");
 
-    kawasu.microtable.multiExpand("myMicroTable") ?
+    var bState = kawasu.microtable.multiExpand("myMicroTable") ?
         kawasu.microtable.multiExpand("myMicroTable", false) :
         kawasu.microtable.multiExpand("myMicroTable", true);
 
-    kawasu.microtable.refreshView("myMicroTable");
+    kawasu.orders.btnToggleMultiSingleExp_setBtnText(bState);
 
     console.log(prefix + "Exiting");
+}
+
+kawasu.orders.btnToggleMultiSingleExp_setBtnText = function (bState) {
+    // If state unknown, go get it...
+    bState = (typeof bState === 'undefined') ?
+        kawasu.microtable.multiExpand("myMicroTable") : bState;
+
+    // Set the button text to reveal current state
+    var btnToggleMultiSingleExp = document.getElementById("btnToggleMultiSingleExp");
+    btnToggleMultiSingleExp.value = "Toggle Toggle Multi-Single Exp:" + (bState ? "T" : "F");
 }

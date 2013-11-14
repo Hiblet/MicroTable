@@ -158,7 +158,6 @@ kawasu.microtable.buildRawTables = function (sTableId) {
     var tableControl = document.createElement("table");
     var classTable = styleDefn["tableClass"] || "";
     tableControl.className = classTable;
-    //tableControl.id = sTableId + "_Control";
     tableControl.id = kawasu.microtable.getTableId(sTableId, 0);
 
     var trHeaderControl = document.createElement("tr");
@@ -179,8 +178,6 @@ kawasu.microtable.buildRawTables = function (sTableId) {
     textboxRowNavigate.className = classTextboxRowNavigate;
 
     fc.utils.addEvent(textboxRowNavigate, "change", kawasu.microtable.textboxRowNavigate_onChange);
-    //fc.utils.addEvent(textboxRowNavigate, "onkeyup", kawasu.microtable.textboxRowNavigate_onKeyUp);
-    //fc.utils.addEvent(textboxRowNavigate, "onkeypress", fc.utils.isNumericKey);
     textboxRowNavigate.setAttribute("onkeyup", "return kawasu.microtable.textboxRowNavigate_onKeyUp(event)");
     textboxRowNavigate.setAttribute("onkeypress", "return kawasu.microtable.textboxRowNavigate_onKeyPress(event)");
 
@@ -482,6 +479,7 @@ kawasu.microtable.setViewStateVertical = function (sTableId, rawTables, indexCur
     // Show the row's native header.
 
     var bExpandable = kawasu.microtable[sTableId]["bExpandable"];
+    var bMultiExpand = kawasu.microtable[sTableId]["bMultiExpand"];
 
     var tableControl = rawTables.children[0];
     var nodeListLength = rawTables.children.length;
@@ -514,7 +512,7 @@ kawasu.microtable.setViewStateVertical = function (sTableId, rawTables, indexCur
             kawasu.microtable.tableExpansionState(table, (i == indexCurrentRow)); // Show rows only for current rowTable
         }
         else {
-            kawasu.microtable.tableExpansionState(table, true);
+            kawasu.microtable.tableExpansionState(table, true); // Show all rows for all tables
         }
         kawasu.microtable.elementVis(table, true); // Show table
     }
@@ -759,7 +757,7 @@ kawasu.microtable.thNativeHeader_onClick = function (event) {
     var tableTargetId = tableTarget.id;
     var arraySplit = tableTargetId.split("_");
     var sTableId = arraySplit[0];
-    kawasu.microtable[sTableId]["indexCurrentRow"] = parseInt(arraySplit[1],10);
+    kawasu.microtable[sTableId]["indexCurrentRow"] = parseInt(arraySplit[1], 10);
 
     var bExpandable = kawasu.microtable[sTableId]["bExpandable"];
     var bMultiExpand = kawasu.microtable[sTableId]["bMultiExpand"];
@@ -782,12 +780,7 @@ kawasu.microtable.thNativeHeader_onClick = function (event) {
     else {
         // Table only allows one expanded row.
         // Expand this row, compress all others.
-        var rawTables = tableTarget.parentNode;
-        var nodeListLength = rawTables.children.length;
-        for (var i = 0; i < nodeListLength; ++i) {
-            var table = rawTables.children[i];            
-            kawasu.microtable.tableExpansionState(table, (table.id == tableTarget.id));
-        }
+        kawasu.microtable.applySingleExpand(sTableId);
     }
 
     console.log(prefix + "Exiting");
@@ -947,6 +940,22 @@ kawasu.microtable.refreshView = function (sTableId) {
 // PRIVATE HELPERS
 //
 
+kawasu.microtable.applySingleExpand = function (sTableId) {
+    var prefix = "kawasu.microtable.applySingleExpand() - ";
+    console.log(prefix + "Entering");
+
+    var indexCurrentRow = kawasu.microtable[sTableId]["indexCurrentRow"];
+    var tableTargetId = kawasu.microtable.getTableId(sTableId, indexCurrentRow);
+    var rawTables = kawasu.microtable.getRawTables(sTableId);
+
+    var nodeListLength = rawTables.children.length;
+    for (var i = 0; i < nodeListLength; ++i) {
+        var table = rawTables.children[i];
+        kawasu.microtable.tableExpansionState(table, (table.id == tableTargetId));
+    }
+    console.log(prefix + "Exiting");
+}
+
 kawasu.microtable.isControlTable = function (table) {
     var arraySplit = (table.id).split("_");
     return (parseInt(arraySplit[1], 10) == 0);
@@ -989,15 +998,6 @@ kawasu.microtable.tableExpansionState = function (table, bExpansionState) {
             else {
                 // Header rows
                 kawasu.microtable.elementVis(row, !(bIsControlTable && i == 0)); // Don't show the control table's zero row, show it's row[1] though
-                /*
-                if (bIsControlTable && i == 0) {
-                kawasu.microtable.elementVis(row, false);
-                }
-                else {
-
-                kawasu.microtable.elementVis(row, true);
-                }
-                */
             }
         }
 
@@ -1025,6 +1025,7 @@ kawasu.microtable.expandable = function (sTableId, bExpandable) {
         // Set
         console.log(prefix + "INFO: Setting bExpandable to " + (bExpandable ? "true" : "false"));
         kawasu.microtable[sTableId]["bExpandable"] = bExpandable;
+        kawasu.microtable.applyViewState(sTableId);
     }
 
     console.log(prefix + "Exiting");
@@ -1041,6 +1042,7 @@ kawasu.microtable.multiExpand = function (sTableId, bMultiExpand) {
         // Set
         console.log(prefix + "INFO: Setting bMultiExpand to " + (bMultiExpand ? "true" : "false"));
         kawasu.microtable[sTableId]["bMultiExpand"] = bMultiExpand;
+        kawasu.microtable.applyViewState(sTableId);
     }
 
     console.log(prefix + "Exiting");
