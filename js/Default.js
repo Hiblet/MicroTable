@@ -43,6 +43,7 @@ kawasu.orders.init = function () {
     // For controls
     styleDefn["buttonRowNavigate"] = "buttonRowNavigate";
     styleDefn["textboxRowNavigate"] = "textboxRowNavigate";
+    styleDefn["checkboxSelect"] = "checkboxSelect";
 
     var divContainer = document.getElementById("divContainer");
 
