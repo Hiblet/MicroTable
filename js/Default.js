@@ -26,7 +26,7 @@ kawasu.orders.init = function () {
     kawasu.orders.hookupHandlers();
 
     // BUILD A TEST DATA SET
-    var arrData = kawasu.orders.createZeroTestData();
+    var arrData = kawasu.orders.createTestData();
 
     // BUILD A STYLE OBJECT TO DEFINE THE TABLE STYLE
     var styleDefn = new Object();
@@ -66,7 +66,7 @@ kawasu.orders.init = function () {
     kawasu.orders.btnToggleMultiSingleExp_setBtnText();
     kawasu.orders.btnToggleSelect_setBtnText();
 
-    /*
+    
     // TEST A:
     // Add some data to arrData, and rebuild the tables
     // Give it a new field.
@@ -81,11 +81,11 @@ kawasu.orders.init = function () {
     //$("#divContainer").append(myMicroTableRebuilt);
 
     //divContainer.removeChild(myMicroTable);
-    while (divContainer.lastChild) { divContainer.removeChild(divContainer.lastChild); }
-    divContainer.appendChild(myMicroTableRebuilt);
+    //while (divContainer.lastChild) { divContainer.removeChild(divContainer.lastChild); }
+    //divContainer.appendChild(myMicroTableRebuilt);
     //
     // END TEST A:
-    */
+    
 
     // TEST B: Test delete function
     // kawasu.microtable.itemDelete("myMicroTable", 1); // Delete 2nd row (index 1), "GADGET"

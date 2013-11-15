@@ -35,6 +35,10 @@ kawasu.microtable.config.nZeroPadding = 6;
 // Constant 
 kawasu.microtable.config.sEmptyStringHtml = "&nbsp;";
 
+// Div Wrapper for return
+kawasu.microtable.config.sDivOuterPrefix = "div_";
+kawasu.microtable.config.sDivOuterSuffix = "_Outer";
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // ENTRY POINT
@@ -64,23 +68,22 @@ kawasu.microtable.build = function (arrData, styleDefn, sTableId, sItemName, nRo
 
     var rawTables = kawasu.microtable.buildRawTables(sTableId); // returns nodelist of tables
 
-    if (fc.utils.isInvalidVar(rawTables)) {
-        console.log(prefix + "ERROR: Failed to create raw tables.");
-        return;
-    }
-    else {
-        kawasu.microtable.applyViewState(sTableId, rawTables);
-        console.log(prefix + "Exiting");
-        return rawTables;
-    }
+    // Apply view state
+    kawasu.microtable.applyViewState(sTableId, rawTables);
 
-    // DIAGNOSTICS
-    // Iterate returned array and display tables
-    //for (var i = 0; i < kawasu.microtable[sTableId]["rawTables"].length; ++i) {
-    //    (document.getElementById("divContainer")).appendChild(kawasu.microtable[sTableId]["rawTables"][i]);
-    //}
-    // END DIAGNOSTICS
+    // Get the table dimensions
+    //var sizeTable = kawasu.microtable.getTableSize(rawTables, 0);
 
+    // Create a wrapping div to hold the tables
+    var divOuter = document.createElement("div");
+    divOuter.id = kawasu.microtable.config.sDivOuterPrefix + sTableId + kawasu.microtable.config.sDivOuterSuffix;
+    //divOuter.style.overflowY = "scroll"; // Allow control via container div
+    divOuter.style.width = "100%"; // Container controls width also
+
+    divOuter.appendChild(rawTables);
+
+    console.log(prefix + "Exiting");
+    return divOuter;
 }
 
 
@@ -326,7 +329,13 @@ kawasu.microtable.rebuild = function (sTableId) {
     var rawTables_rebuild = kawasu.microtable.buildRawTables(sTableId);
 
     // Apply view state
-    kawasu.microtable.applyViewState(sTableId,rawTables_rebuild);
+    kawasu.microtable.applyViewState(sTableId, rawTables_rebuild);
+
+    // Drop the current contents of divOuter and attach new rawtables
+    var divOuterId = kawasu.microtable.config.sDivOuterPrefix + sTableId + kawasu.microtable.config.sDivOuterSuffix;
+    var divOuter = document.getElementById(divOuterId);
+    while (divOuter.lastChild) divOuter.removeChild(divOuter.lastChild);
+    divOuter.appendChild(rawTables_rebuild);
 
     console.log(prefix + "Exiting");
 
@@ -1292,6 +1301,41 @@ kawasu.microtable.addRow = function (sTableId, table, bHeader, sCell1Text, sCell
 
     return tr;
 }
+
+
+kawasu.microtable.getTableSize = function (rawTables) {
+    var prefix = "kawasu.microtable.getTableSize() - ";
+    console.log(prefix + "Entering");
+
+    var cloneControlTable = rawTables.children[0].cloneNode(true);
+    cloneControlTable.style.width = "auto";
+
+    var size = new Object();
+    size.height = 0;
+    size.width = 0;
+
+    // Make an invisible div for sizing the table
+    var divSizing = document.createElement('div');
+    divSizing.style.position = "absolute";
+    divSizing.style.top = "0px";
+    divSizing.style.left = "0px";
+    divSizing.style.width = "1px";
+    //divSizing.style.visibility = "hidden";
+
+    document.body.appendChild(divSizing);
+    divSizing.appendChild(cloneControlTable);
+
+    size.height = cloneControlTable.offsetHeight;
+    size.width = cloneControlTable.offsetWidth;
+
+    divSizing.removeChild(cloneControlTable);
+    document.body.removeChild(divSizing);
+
+    console.log(prefix + "Exiting");
+
+    return size;
+}
+
 
 //
 ////////////////////////////////////////////////////////////////////////////////
