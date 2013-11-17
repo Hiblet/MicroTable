@@ -313,7 +313,7 @@ kawasu.microtable.buildRawTables = function (sTableId) {
     console.log(prefix + "Exiting");
 }
 
-kawasu.microtable.rebuild = function (sTableId) {
+kawasu.microtable.rebuild = function (sTableId,arrDataNew) {
     var prefix = "kawasu.microtable.rebuild() - ";
     console.log(prefix + "Entering");
 
@@ -322,7 +322,10 @@ kawasu.microtable.rebuild = function (sTableId) {
     // figure out what has changed, we drop the tables and rebuild.
 
     // Assumes: sItemName remains the same.
-    //          The reference to arrData is still valid.
+
+    if (typeof arrDataNew !== 'undefined') {
+        kawasu.microtable[sTableId]["arrData"] = arrDataNew;
+    }
 
     // Build first, and then swap new built data into place
     kawasu.microtable[sTableId]["header"] = kawasu.microtable.buildHeaderData(kawasu.microtable[sTableId]["arrData"]);
