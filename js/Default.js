@@ -25,8 +25,6 @@ kawasu.orders.init = function () {
 
     kawasu.orders.hookupHandlers();
 
-    // BUILD A TEST DATA SET
-    var arrData = kawasu.orders.createTestData();
 
     // BUILD A STYLE OBJECT TO DEFINE THE TABLE STYLE
     var styleDefn = new Object();
@@ -45,6 +43,9 @@ kawasu.orders.init = function () {
     styleDefn["textboxRowNavigate"] = "textboxRowNavigate";
     styleDefn["checkboxSelect"] = "checkboxSelect";
 
+    // BUILD A TEST DATA SET
+    var arrData = kawasu.orders.createTestDataA();
+
     var divContainer = document.getElementById("divContainer");
 
     // Microtable testing
@@ -62,6 +63,8 @@ kawasu.orders.init = function () {
         divContainer.appendChild(myMicroTable);
     }
 
+
+
     // Update the buttons to show current state
     kawasu.orders.btnToggleExpandable_setBtnText();
     kawasu.orders.btnToggleMultiSingleExp_setBtnText();
@@ -76,8 +79,13 @@ kawasu.orders.init = function () {
     obj["Flock"] = "Mr. Hibbert's Flock";
     arrData.push(obj);
 
-
     var myMicroTableRebuilt = kawasu.microtable.rebuild("myMicroTable");
+
+    // BUILD A 2ND TEST DATA SET
+    var arrDataB = kawasu.orders.createTestDataB();
+    var myMicroTableRebuiltAgain = kawasu.microtable.rebuild("myMicroTable", arrDataB);
+
+
     //$("#divContainer").remove(myMicroTable); // Drop tables from DOM
     //$("#divContainer").append(myMicroTableRebuilt);
 
@@ -123,8 +131,8 @@ kawasu.orders.createZeroTestData = function () {
 }
 
 
-kawasu.orders.createTestData = function () {
-    var prefix = "kawasu.orders.createTestData() - ";
+kawasu.orders.createTestDataA = function () {
+    var prefix = "kawasu.orders.createTestDataA() - ";
     console.log(prefix + "Entering");
 
     // Make a Json object to build a table out of
@@ -148,6 +156,45 @@ kawasu.orders.createTestData = function () {
     var obj3 = {
         "Contract": "BOBBIN",
         "Side": "SELL",
+        "Qty": "32",
+        "Price": "19.4",
+        "StopPrice": "18.5"
+    };
+
+    array.push(obj1);
+    array.push(obj2);
+    array.push(obj3);
+
+    return array;
+
+    console.log(prefix + "Exiting");
+}
+
+kawasu.orders.createTestDataB = function () {
+    var prefix = "kawasu.orders.createTestDataB() - ";
+    console.log(prefix + "Entering");
+
+    // Make a Json object to build a table out of
+    var array = [];
+
+    var obj1 = {
+        "Contract": "BODGIT",
+        "Side": "SELL",
+        "Qty": "3",
+        "Price": "98.3"
+    };
+
+    var obj2 = {
+        "Contract": "NUBBIN",
+        "Side": "SELL",
+        "Comment": "No comment",
+        "Qty": "7",
+        "Price": "101.32"
+    };
+
+    var obj3 = {
+        "Contract": "GUFFING",
+        "Side": "BUY",
         "Qty": "32",
         "Price": "19.4",
         "StopPrice": "18.5"
