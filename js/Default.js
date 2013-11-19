@@ -200,9 +200,36 @@ kawasu.orders.createTestDataB = function () {
         "StopPrice": "18.5"
     };
 
+    var obj4 = {
+        "Contract": "MIDDIN",
+        "Side": "SELL",
+        "Qty": "21",
+        "Price": "19.3",
+        "StopPrice": "9.34"
+    };
+
+    var obj5 = {
+        "Contract": "BODDIN",
+        "Side": "BUY",
+        "Qty": "335",
+        "Price": "87.4",
+        "StopPrice": "34.1"
+    };
+
+    var obj6 = {
+        "Contract": "TIFFIN",
+        "Side": "SELL",
+        "Qty": "236",
+        "Price": "32.1",
+        "StopPrice": "78.3"
+    };
+
     array.push(obj1);
     array.push(obj2);
     array.push(obj3);
+    array.push(obj4);
+    array.push(obj5);
+    array.push(obj6);
 
     return array;
 
@@ -243,6 +270,9 @@ kawasu.orders.hookupHandlers = function () {
     var btnDeleteItem = document.getElementById("btnDeleteItem");
     fc.utils.addEvent(btnDeleteItem, "click", kawasu.orders.btnDeleteItem_onClick);
 
+    var btnDeleteRequest = document.getElementById("btnDeleteRequest");
+    fc.utils.addEvent(btnDeleteRequest, "click", kawasu.orders.btnDeleteRequest_onClick);
+
     var btnToggleView = document.getElementById("btnToggleView");
     fc.utils.addEvent(btnToggleView, "click", kawasu.orders.btnToggleView_onClick);
 
@@ -270,6 +300,16 @@ kawasu.orders.btnDeleteItem_onClick = function () {
 
     console.log(prefix + "Exiting");
 }
+
+kawasu.orders.btnDeleteRequest_onClick = function () {
+    var prefix = "kawasu.orders.btnDeleteRequest_onClick() - ";
+    console.log(prefix + "Entering");
+
+    kawasu.microtable.deleteRequest("myMicroTable", true);
+
+    console.log(prefix + "Exiting");
+}
+
 
 kawasu.orders.btnToggleView_onClick = function () {
     var prefix = "kawasu.orders.btnToggleView_onClick() - ";
