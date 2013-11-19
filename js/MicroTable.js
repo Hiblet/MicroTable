@@ -890,19 +890,39 @@ kawasu.microtable.itemsDelete = function (sTableId, arrRowsToDelete, bDeleteSour
     console.log(prefix + "Exiting");
 }
 
+kawasu.microtable.deleteRequest = function (sTableId, bResetSelected) {
+    var prefix = "kawasu.microtable.deleteRequest() - ";
+    console.log(prefix + "Entering");
+
+    // This fn returns the data indices currently selected, so that the
+    // parent can manage it's data.
+
+    // Default Syntax; Default to true
+    bResetSelected = (typeof bResetSelected === 'undefined') ? true : bResetSelected;
+
+    var selectedDataIndices = kawasu.microtable.getSelectedIndices(sTableId, true); // get zero-based index
+
+    if (bResetSelected) kawasu.microtable.setSelectAll(sTableId, false);
+
+    console.log(prefix + "Exiting");
+    return selectedDataIndices;
+}
+
 kawasu.microtable.setSelectAll = function (sTableId, bSelect) {
     var prefix = "kawasu.microtable.setSelectAll() - ";
     console.log(prefix + "Entering");
 
+    // Default syntax - defaults to true, select all.
+    bSelect = (typeof bSelect !== 'undefined') ? bSelect : true;
+
     var bMultiSelect = kawasu.microtable[sTableId]["bMultiSelect"];
-    if (bMultiSelect == false) {
+    if (bMultiSelect == false && bSelect == true) {
+        // In single select, you cannot select all.  
+        // You can, of course, deselect all.
         console.log(prefix + "WARNING: Cannot select all in Single Select Mode, no action will be taken.");
         console.log(prefix + "Exiting");
         return;
     }
-
-    // Default syntax - defaults to true, select all.
-    bSelect = (typeof bSelect !== 'undefined') ? bSelect : true;
 
     var rawTables = kawasu.microtable.getRawTables(sTableId);
     var nodeListLength = rawTables.children.length;
@@ -1215,9 +1235,15 @@ kawasu.microtable.setSingleSelect = function (sTableId, nSelectedIndex) {
     console.log(prefix + "Exiting");
 }
 
-kawasu.microtable.getSelectedIndices = function (sTableId) {
+kawasu.microtable.getSelectedIndices = function (sTableId, bZeroIndexed) {
     var prefix = "kawasu.microtable.getSelectedIndices() - ";
     console.log(prefix + "Entering");
+
+    // Default syntax;  Default to returning 1-indexed tableRow, but provide the 
+    // facility of returning zero-indexed data row also.
+    bZeroIndexed = (typeof bZeroIndexed === 'undefined') ? false : bZeroIndexed;
+
+    var shift = bZeroIndexed ? -1 : 0;
 
     var arraySelected = [];
     var rawTables = kawasu.microtable.getRawTables(sTableId);
@@ -1227,7 +1253,7 @@ kawasu.microtable.getSelectedIndices = function (sTableId) {
         var table = rawTables.children[i];
         var checkbox = kawasu.microtable.getCheckboxFromTable(table);
         if (checkbox.checked) {
-            arraySelected.push(i);
+            arraySelected.push(i + shift);
         }
     }
 

@@ -20,6 +20,7 @@
     <div>
     
         <input type="button" id="btnDeleteItem" value="Delete Item" />
+        <input type="button" id="btnDeleteRequest" value="Delete Request" />
         <input type="button" id="btnToggleView" value="Toggle View" />
         <input type="button" id="btnToggleSelect" value="Toggle Select" />
         <br />
