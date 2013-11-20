@@ -19,6 +19,11 @@ var kawasu = kawasu || {};
 
 if (fc.utils.isInvalidVar(kawasu.orders)) { kawasu.orders = new Object(); }
 
+// Global Temporary for testing
+var bGreyOut = true;
+
+
+
 kawasu.orders.init = function () {
     var prefix = "kawasu.orders.init() - ";
     console.log(prefix + "Entering");
@@ -31,6 +36,7 @@ kawasu.orders.init = function () {
     styleDefn["tableClass"] = "tableTestClass";
     styleDefn["tdClassKey"] = "tdTestClassKey";
     styleDefn["tdClassValue"] = "tdTestClassValue";
+    styleDefn["tdClassValueGreyOut"] = "tdTestClassValueGreyOut";
     styleDefn["thClass"] = "thTestClass";
     styleDefn["trClassHeader"] = "trTestClassHeader";
     styleDefn["trClassData"] = "trTestClassData";
@@ -70,7 +76,7 @@ kawasu.orders.init = function () {
     kawasu.orders.btnToggleMultiSingleExp_setBtnText();
     kawasu.orders.btnToggleSelect_setBtnText();
 
-    
+
     // TEST A:
     // Add some data to arrData, and rebuild the tables
     // Give it a new field.
@@ -94,7 +100,7 @@ kawasu.orders.init = function () {
     //divContainer.appendChild(myMicroTableRebuilt);
     //
     // END TEST A:
-    
+
 
     // TEST B: Test delete function
     // kawasu.microtable.itemDelete("myMicroTable", 1); // Delete 2nd row (index 1), "GADGET"
@@ -290,6 +296,9 @@ kawasu.orders.hookupHandlers = function () {
 
     var btnToggleMultiSingleExp = document.getElementById("btnToggleMultiSingleExp");
     fc.utils.addEvent(btnToggleMultiSingleExp, "click", kawasu.orders.btnToggleMultiSingleExp_onClick);
+
+    var btnGreyOutToggle = document.getElementById("btnGreyOutToggle");
+    fc.utils.addEvent(btnGreyOutToggle, "click", kawasu.orders.btnGreyOutToggle_onClick);
 }
 
 kawasu.orders.btnDeleteItem_onClick = function () {
@@ -413,4 +422,14 @@ kawasu.orders.btnToggleMultiSingleExp_setBtnText = function (bState) {
     // Set the button text to reveal current state
     var btnToggleMultiSingleExp = document.getElementById("btnToggleMultiSingleExp");
     btnToggleMultiSingleExp.value = "Toggle Toggle Multi-Single Exp:" + (bState ? "T" : "F");
+}
+
+kawasu.orders.btnGreyOutToggle_onClick = function () {
+    var prefix = "kawasu.orders.btnGreyOutToggle_onClick() - ";
+    console.log(prefix + "Entering");
+
+    kawasu.microtable.greyRows("myMicroTable", "Contract", "GUFFING", bGreyOut);
+    bGreyOut = !bGreyOut;
+
+    console.log(prefix + "Exiting");
 }
