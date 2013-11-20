@@ -75,6 +75,16 @@ th
     overflow: hidden;
 }
 
+.tdTestClassValueGreyOut
+{
+    background-color:White;
+    color:#DDDDDD;
+    display:block; /* IMPORTANT: This is required for ellipsis to work */
+    text-overflow:ellipsis;
+    overflow: hidden;
+}
+
+
 .tdTestClassKey
 {
     background-color:#9fa1fc;

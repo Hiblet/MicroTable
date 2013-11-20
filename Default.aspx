@@ -14,6 +14,7 @@
     <link rel="Stylesheet" type="text/css" href="<%= ResolveClientUrl("~/Default.css") %>" />    
 
     <title>MicroTable Experiment</title>
+
 </head>
 <body>
     <form id="form1" runat="server">
@@ -28,7 +29,7 @@
         <input type="button" id="btnDeselectAll" value="Deselect All" />
         <input type="button" id="btnToggleExpandable" value="Toggle Expandable" />
         <input type="button" id="btnToggleMultiSingleExp" value="Toggle Multi-Single Exp" />
-
+        <input type="button" id="btnGreyOutToggle" value="Toggle GreyOut" />
         
         <br />
         <br />

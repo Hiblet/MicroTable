@@ -951,6 +951,48 @@ kawasu.microtable.refreshView = function (sTableId) {
 
     console.log(prefix + "Exiting");
 }
+
+kawasu.microtable.greyRows = function (sTableId, sColumnName, sColumnData, bGreyOut) {
+    var prefix = "kawasu.microtable.greyRows() - ";
+    console.log(prefix + "Entering");
+
+    // Default Syntax; This defaults to true, grey out the row
+    bGreyOut = (typeof bGreyOut === 'undefined') ? true : bGreyOut;
+
+    if (!kawasu.microtable[sTableId]["styleDefn"].hasOwnProperty("tdClassValueGreyOut")) {
+        console.log(prefix + "WARNING: No tdClassValueGreyOut style is set in the style definition for this table; No action taken.");
+        return;
+    }
+
+
+    ///////////////////////////////////////////////////////////////////////////
+    // Grey out the rows where the passed column matches the passed data string
+
+    var tdClassValueGreyOut = kawasu.microtable[sTableId]["styleDefn"]["tdClassValueGreyOut"];
+    var tdClassValue = kawasu.microtable[sTableId]["styleDefn"]["tdClassValue"];
+
+    var rowTables = kawasu.microtable.getRowTables(sTableId, sColumnName, sColumnData);
+
+    if (typeof rowTables === 'undefined' || rowTables.length == 0) {
+        console.log(prefix + "WARNING: No data found matching the criteria");
+        return;
+    }
+
+    // Iterate tables, greying them out, or not, as appropriate
+    for (var i = 0; i < rowTables.length; ++i) {
+        rowTable = rowTables[i];
+        // Iterate the rows in the table
+        for (var j = 0; j < rowTable.rows.length; ++j) {
+            var row = rowTable.rows[j];
+            var cellValue = row.cells[1];
+            cellValue.className = (bGreyOut ? tdClassValueGreyOut : tdClassValue);
+        }
+    }
+
+    console.log(prefix + "Exiting");
+    return rowTables;
+}
+
 //
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -971,6 +1013,56 @@ kawasu.microtable.refreshView = function (sTableId) {
 ///////////////////////////////////////////////////////////////////////////////
 // PRIVATE HELPERS
 //
+
+kawasu.microtable.getRowTables = function (sTableId, sKey, sValue) {
+    var prefix = "kawasu.microtable.getRowTables() - ";
+    console.log(prefix + "Entering");
+
+    var iRow = kawasu.microtable.getRowIndexFromKey(sTableId, sKey);
+    if (iRow == -1) {
+        console.log(prefix + "ERROR: Could not get a row index value for a key called >" + sKey + "<");
+        return;
+    }
+
+    // Return an array of ref-to-rowTables where the passed sKey equals sValue
+    var arrayRowTables = [];
+
+    var rawTables = kawasu.microtable.getRawTables(sTableId);
+    var nodeListLength = rawTables.children.length;
+    for (var i = 0; i < nodeListLength; ++i) {
+        var table = rawTables.children[i];
+        var row = table.rows[iRow]; // Key row
+        var cell = row.cells[1]; // Value cell
+        if (sValue == fc.utils.textContent(cell)) {
+            arrayRowTables.push(table);
+        }
+    }
+
+    console.log(prefix + "Exiting");
+    return arrayRowTables;
+}
+
+kawasu.microtable.getRowIndexFromKey = function (sTableId, sKey) {
+    var prefix = "kawasu.microtable.getRowIndexFromKey() - ";
+    console.log(prefix + "Entering");
+
+    var header = kawasu.microtable[sTableId]["header"];
+
+    // Walk the header.  The header was walked to build each row, which has a key and value.
+    // We want to find the row number where the key matches
+
+    var count = 0;
+    for (var prop in header) {
+        if (header.hasOwnProperty(prop)) {
+            ++count;
+            if (prop == sKey) return count;
+        }
+    }
+
+    console.log(prefix + "Exiting");
+    return -1;
+}
+
 
 kawasu.microtable.applySingleExpand = function (sTableId) {
     var prefix = "kawasu.microtable.applySingleExpand() - ";
