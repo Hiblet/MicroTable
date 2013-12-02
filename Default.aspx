@@ -30,6 +30,7 @@
         <input type="button" id="btnToggleExpandable" value="Toggle Expandable" />
         <input type="button" id="btnToggleMultiSingleExp" value="Toggle Multi-Single Exp" />
         <input type="button" id="btnGreyOutToggle" value="Toggle GreyOut" />
+        <input type="button" id="btnApplySort" value="Apply Sort" />
         
         <br />
         <br />
