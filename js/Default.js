@@ -299,6 +299,9 @@ kawasu.orders.hookupHandlers = function () {
 
     var btnGreyOutToggle = document.getElementById("btnGreyOutToggle");
     fc.utils.addEvent(btnGreyOutToggle, "click", kawasu.orders.btnGreyOutToggle_onClick);
+
+    var btnApplySort = document.getElementById("btnApplySort");
+    fc.utils.addEvent(btnApplySort, "click", kawasu.orders.btnApplySort_onClick);
 }
 
 kawasu.orders.btnDeleteItem_onClick = function () {
@@ -421,7 +424,7 @@ kawasu.orders.btnToggleMultiSingleExp_setBtnText = function (bState) {
 
     // Set the button text to reveal current state
     var btnToggleMultiSingleExp = document.getElementById("btnToggleMultiSingleExp");
-    btnToggleMultiSingleExp.value = "Toggle Toggle Multi-Single Exp:" + (bState ? "T" : "F");
+    btnToggleMultiSingleExp.value = "Toggle Multi-Single Exp:" + (bState ? "T" : "F");
 }
 
 kawasu.orders.btnGreyOutToggle_onClick = function () {
@@ -430,6 +433,15 @@ kawasu.orders.btnGreyOutToggle_onClick = function () {
 
     kawasu.microtable.greyRows("myMicroTable", "Contract", "GUFFING", bGreyOut);
     bGreyOut = !bGreyOut;
+
+    console.log(prefix + "Exiting");
+}
+
+kawasu.orders.btnApplySort_onClick = function () {
+    var prefix = "kawasu.orders.btnApplySort_onClick() - ";
+    console.log(prefix + "Entering");
+
+    kawasu.microtable.applySortByKeyName("myMicroTable", "Contract", "ASC");
 
     console.log(prefix + "Exiting");
 }

@@ -250,14 +250,14 @@ kawasu.microtable.buildRawTables = function (sTableId) {
     // Add dummy rows in case we have to show a blank table
     //
 
-    var tableControlNativeHeader = kawasu.microtable.addRow(sTableId, tableControl, true, kawasu.microtable.getItemText(sItemName, 0)); // Native header row "Row:0"
+    var tableControlNativeHeader = kawasu.microtable.addRow(sTableId, tableControl, true, -1, kawasu.microtable.getItemText(sItemName, 0)); // Native header row "Row:0"
     var tableControlNativeHeaderCellCol1 = tableControlNativeHeader.cells[0];
     fc.utils.addEvent(tableControlNativeHeaderCellCol1, "click", kawasu.microtable.thNativeHeader_onClick);
 
 
     // Add the minimum number of blank rows
     for (var j = 0; j < nRowsMinimum; ++j) {
-        kawasu.microtable.addRow(sTableId, tableControl, false); // bHeader=false ie "td", not "th"
+        kawasu.microtable.addRow(sTableId, tableControl, false, -1); // bHeader=false ie "td", not "th"
     }
 
     rawTables.appendChild(tableControl);
@@ -277,7 +277,7 @@ kawasu.microtable.buildRawTables = function (sTableId) {
         table.id = kawasu.microtable.getTableId(sTableId, i + 1);
 
         // Add native header
-        var trNativeHeader = kawasu.microtable.addRow(sTableId, table, true, kawasu.microtable.getItemText(sItemName, i + 1));
+        var trNativeHeader = kawasu.microtable.addRow(sTableId, table, true, i, kawasu.microtable.getItemText(sItemName, i + 1));
         var trNativeHeaderCellCol1 = trNativeHeader.cells[0];
         fc.utils.addEvent(trNativeHeaderCellCol1, "click", kawasu.microtable.thNativeHeader_onClick);
 
@@ -294,19 +294,22 @@ kawasu.microtable.buildRawTables = function (sTableId) {
         // Each header element is a key, and there should be a value in the data element.
         for (var prop in header) {
             if (header.hasOwnProperty(prop)) {
-                kawasu.microtable.addRow(sTableId, table, false, prop, obj[prop]);
+                kawasu.microtable.addRow(sTableId, table, false, i, prop, obj[prop]);
             }
 
         } // end of iteration of data object's properties (rows for each object as a table)
 
         // Pad with blank rows if required
         for (var k = 0; k < nRowsRequired; ++k) {
-            kawasu.microtable.addRow(sTableId, table, false);
+            kawasu.microtable.addRow(sTableId, table, false, i);
         }
 
         rawTables.appendChild(table);
 
     } // end of iteration of data object array (table completed for this object)
+
+    // Make sortable
+    kawasu.microtable.makeKeysSortable(sTableId, rawTables);
 
     return rawTables;
 
@@ -864,28 +867,48 @@ kawasu.microtable.itemsDelete = function (sTableId, arrRowsToDelete, bDeleteSour
     kawasu.microtable[sTableId]["indexCurrentRow"] = indexCurrentRow;
 
     // Do the delete, backwards, so that indices in the data array are always valid
-    for (var i = arrRowsToDelete.length; i > 0; --i) {
-        var index = i - 1;
-        var tableToDeleteId = kawasu.microtable.getTableId(sTableId, arrRowsToDelete[index]);
-        var tableToDelete = document.getElementById(tableToDeleteId);
-        rawTables.removeChild(tableToDelete);
+
+    var arrDataIndicesToDelete = [];
+    for (var i = arrRowsToDelete.length - 1; i >= 0; --i) {
+        
+        //var tableToDeleteId = kawasu.microtable.getTableId(sTableId, arrRowsToDelete[index]);
+        //var tableToDelete = document.getElementById(tableToDeleteId);
+        var tableToDelete = rawTables.children[(arrRowsToDelete[i])]; // Delete by position
+
         if (bDeleteSourceData) {
-            arrData.splice(arrRowsToDelete[index] - 1, 1); // Converting from a visual row index to data index, sub 1
+            //arrData.splice(arrRowsToDelete[index] - 1, 1); // Converting from a visual row index to data index, sub 1
+            var row1 = tableToDelete.rows[1]; // rows[0] is the native header, get first row after this
+            var iDataIndex = kawasu.microtable.getDataIndexFromRowName(row1);
+            arrDataIndicesToDelete.push(iDataIndex);
         }
+
+        rawTables.removeChild(tableToDelete);
     }
 
-    // Rename the remaining tables so that navigation still works
-    nodeListLength = rawTables.children.length;
-    for (var i = 1; i < nodeListLength; ++i) {
-        var table = rawTables.children[i];
-        table.id = kawasu.microtable.getTableId(sTableId, i);
-        var th1 = table.rows[0].cells[0];
-        var sItemName = kawasu.microtable[sTableId]["sItemName"];
-        fc.utils.textContent(th1, kawasu.microtable.getItemText(sItemName, i));
+    // Delete data and rebuild
+    if (arrDataIndicesToDelete.length > 0) {
+        arrDataIndicesToDelete.sort(function (a, b) { return b - a }); // Reverse numeric sort
+        for (var i = 0; i < arrDataIndicesToDelete.length; ++i) {
+            var iDataIndexToDelete = arrDataIndicesToDelete[i];
+            arrData.splice(iDataIndexToDelete, 1);
+        }
+        kawasu.microtable.rebuild(sTableId);
     }
+    else {
 
-    // Update the tooltip
-    kawasu.microtable.setLabelTooltipRowCount(sTableId);
+        // Rename the remaining tables so that navigation still works
+        nodeListLength = rawTables.children.length;
+        for (var i = 1; i < nodeListLength; ++i) {
+            var table = rawTables.children[i];
+            table.id = kawasu.microtable.getTableId(sTableId, i);
+            var th1 = table.rows[0].cells[0];
+            var sItemName = kawasu.microtable[sTableId]["sItemName"];
+            fc.utils.textContent(th1, kawasu.microtable.getItemText(sItemName, i));
+        }
+
+        // Update the tooltip
+        kawasu.microtable.setLabelTooltipRowCount(sTableId);
+    }
 
     console.log(prefix + "Exiting");
 }
@@ -982,7 +1005,7 @@ kawasu.microtable.greyRows = function (sTableId, sColumnName, sColumnData, bGrey
     for (var i = 0; i < rowTables.length; ++i) {
         rowTable = rowTables[i];
         // Iterate the rows in the table
-        for (var j = 0; j < rowTable.rows.length; ++j) {
+        for (var j = 1; j < rowTable.rows.length; ++j) {
             var row = rowTable.rows[j];
             var cellValue = row.cells[1];
             cellValue.className = (bGreyOut ? tdClassValueGreyOut : tdClassValue);
@@ -997,6 +1020,218 @@ kawasu.microtable.greyRows = function (sTableId, sColumnName, sColumnData, bGrey
 ///////////////////////////////////////////////////////////////////////////////
 
 
+///////////////////////////////////////////////////////////////////////////////
+//
+// SORTING
+
+kawasu.microtable.sortrowsFlipOrder = function (sTableId, n, comparator) {
+    var prefix = "kawasu.microtable.sortrowsFlipOrder() - ";
+    console.log(prefix + "Entering");
+
+    // Wrapper function that checks the column being ordered, and if it is the
+    // same as the last column used for ordering, reverses the sort order
+
+    var sortKeyCName = sTableId + "_SortKey"; // Numeric row number
+    var sortOrderCName = sTableId + "_SortOrder"; // [ASC,DESC]
+
+    var savedKey = fc.utils.getCookie(sortKeyCName);
+    if (savedKey != null && savedKey != "") {
+        // We have a saved key - is it this key?
+        if (savedKey == n.toString()) {
+            // We have ordered on this key before, flip the order
+            var savedOrder = fc.utils.getCookie(sortOrderCName);
+            if (savedOrder != null && savedOrder != "") {
+                // We have a saved ordering criteria, reverse it and save it
+                if (savedOrder == "ASC") {
+                    fc.utils.setCookie(sortOrderCName, "DESC", 3);
+                }
+                else {
+                    fc.utils.setCookie(sortOrderCName, "ASC", 3);
+                }
+            }            
+        }
+    }
+
+    kawasu.microtable.sortrows(sTableId, n, comparator);
+
+    console.log(prefix + "Exiting");
+}
+
+kawasu.microtable.sortrows = function (sTableId, n, comparator) {
+    var prefix = "kawasu.microtable.sortrows() - ";
+    console.log(prefix + "Entering");
+
+    var bKeyIsNumeric = kawasu.microtable.isKeyNumeric(sTableId, n);
+
+    // Get the cookie settings, if they exist
+    var sortOrder = "DESC";
+    var sortOrderCName = sTableId + "_SortOrder";
+    var lastSortOrder = fc.utils.getCookie(sortOrderCName);
+    if (lastSortOrder != null && lastSortOrder != "") {
+        // Re-apply the saved sort order
+        sortOrder = lastSortOrder;
+    }
+    // else, remains "DESC"
+
+    // Save the name of the current rowTable
+    var indexCurrentRow = kawasu.microtable[sTableId]["indexCurrentRow"];
+    var tableTargetId = kawasu.microtable.getTableIdFromIndexCurrentRow(sTableId, indexCurrentRow);
+
+    // Create an array of tables to sort
+    var arrayRowTables = [];
+    var rawTables = kawasu.microtable.getRawTables(sTableId);
+    var nodeListLength = rawTables.children.length;
+    for (var i = 1; i < nodeListLength; ++i) {
+        arrayRowTables.push(rawTables.children[i]);
+    }
+
+    arrayRowTables.sort(function (rowTable1, rowTable2) {
+
+        // Get the value cells from each table
+        var cell1 = rowTable1.rows[n].cells[1];
+        var cell2 = rowTable2.rows[n].cells[1];
+
+        // Handle undefined cell case
+        if (typeof (cell1) == 'undefined' && typeof (cell2) == 'undefined') {
+            return 0;
+        }
+        else if (typeof (cell1) == 'undefined') {                                 // cell2 wins, return 1
+            return 1;
+        }
+        else if (typeof (cell2) == 'undefined') {                                 // cell1 wins, return -1
+            return -1;
+        }
+
+        var val1 = fc.utils.textContent(cell1);
+        var val2 = fc.utils.textContent(cell2);
+
+        if (comparator) return comparator(val1, val2); // If you've been passed a fn to use as a comparator, use it
+        if (bKeyIsNumeric) return fc.utils.numericComparator(val1, val2);
+
+        // else, do a default comparison
+        return fc.utils.defaultComparator(val1, val2);
+    }); // end of .sort()
+
+    // If descending, reverse the data array
+    if (sortOrder == "DESC") arrayRowTables.reverse();
+
+    // Append the rows under rawTables in the order of the array
+    for (var i = 0; i < arrayRowTables.length; ++i) {
+        var tableCurrent = arrayRowTables[i];
+        
+        if (tableCurrent.id == tableTargetId) {
+            // This table is the current one showing, but it's position has changed,
+            // so the current index has also changed.
+            kawasu.microtable[sTableId]["indexCurrentRow"] = i + 1;
+        }
+
+        // Reset the item number identifier to reflect current order
+        var th1 = tableCurrent.rows[0].cells[0];
+        var sItemName = kawasu.microtable[sTableId]["sItemName"];
+        fc.utils.textContent(th1, kawasu.microtable.getItemText(sItemName, i+1));
+
+        rawTables.appendChild(tableCurrent);
+    }
+
+    // Update the current row textbox to be correct
+    var textboxId = sTableId + "_" + "textboxRowNavigate";
+    var textbox = document.getElementById(textboxId);
+    textbox.value = kawasu.microtable[sTableId]["indexCurrentRow"];
+
+    // Save the sort column and order
+    var sortKeyCName = sTableId + "_SortKey";
+    fc.utils.setCookie(sortKeyCName, n.toString(10), 3);
+    fc.utils.setCookie(sortOrderCName, sortOrder, 3);
+
+
+    console.log(prefix + "Exiting");
+}
+
+kawasu.microtable.makeKeysSortable = function (sTableId, rawTables) {
+    var prefix = "kawasu.microtable.makeKeysSortable() - ";
+    console.log(prefix + "Entering");
+
+    // Attach a function to the Key cell's onclick event to trigger sorting.
+
+    // Iterate the rowTables
+    var nodeListLength = rawTables.children.length;
+    for (var i = 1; i < nodeListLength; ++i) {
+        var table = rawTables.children[i];
+
+        // Iterate the rows of each rowTable
+        for (var j = 1; j < table.rows.length; ++j) {
+            // rows[0] is the native header
+            row = table.rows[j];
+
+            // Attach a closure
+            (function (n) {                                                         // Call this anonymous function with argument i
+                row.cells[0].onclick = function () {                                // Attach a function with a closed n value to each header's onclick event
+                    kawasu.microtable.sortrowsFlipOrder(sTableId, n);               // Close off an instance of sortrows with value n and make it a fn
+                };
+            } (j));
+        }
+    }
+
+    console.log(prefix + "Exiting");
+}
+
+
+kawasu.microtable.applySort = function (sTableId, n, sOrder) {
+    var prefix = "kawasu.microtable.applySort() - ";
+    console.log(prefix + "Entering");
+
+    if (!(sOrder == "ASC" || sOrder == "DESC")) {
+        console.log(prefix + "WARNING: 3rd parameter [sOrder] must be either ASC or DESC; passed >" + sOrder + "<");
+        return;
+    }
+
+    // Set the cookie to the required sort order
+    var sortKeyCName = sTableId + "_SortKey";
+    var sortOrderCName = sTableId + "_SortOrder";
+    fc.utils.setCookie(sortKeyCName, n.toString(10), 3);
+    fc.utils.setCookie(sortOrderCName, sOrder, 3);
+
+    kawasu.microtable.sortrows(sTableId, n);
+
+    console.log(prefix + "Exiting");
+}
+
+kawasu.microtable.applySortByKeyIndex = function (sTableId, n, sOrder) {
+    var prefix = "kawasu.microtable.applySortByKeyIndex() - ";
+    console.log(prefix + "Entering");
+
+    if (n < 0) {
+        console.log(prefix + "ERROR: Key index is negative.");
+        return;
+    }
+
+    kawasu.microtable.applySort(sTableId, n, sOrder);
+
+    console.log(prefix + "Exiting");
+}
+
+kawasu.microtable.applySortByKeyName = function (sTableId, sKeyName, sOrder) {
+    var prefix = "kawasu.microtable.applySortByKeyName() - ";
+    console.log(prefix + "Entering");
+
+    // Function to programmatically apply sort order to a table, rather than
+    // the user clicking on a column header.
+
+    var n = kawasu.microtable.getIndexByKeyName(sTableId, sKeyName);
+
+    if (n == -1) {
+        console.log(prefix + "WARNING: Could not find Key in table >" + sTableId + "< with key name >" + sKeyName + "<.  Cannot sort table as requested.");
+        return;
+    }
+
+    kawasu.microtable.applySort(sTableId, n, sOrder);
+
+    console.log(prefix + "Exiting");
+}
+
+
+//
+///////////////////////////////////////////////////////////////////////////////
 
 
 
@@ -1231,7 +1466,7 @@ kawasu.microtable.setLabelTooltipRowCount = function (sTableId) {
 }
 
 kawasu.microtable.getTableIdFromControlId = function (controlId) {
-    var prefix = "kawasu.microtable.getTableIdFromTextboxId() - ";
+    var prefix = "kawasu.microtable.getTableIdFromControlId() - ";
     console.log(prefix + "Entering");
 
     // Textbox naming may dissociate from table naming.
@@ -1335,8 +1570,6 @@ kawasu.microtable.getSelectedIndices = function (sTableId, bZeroIndexed) {
     // facility of returning zero-indexed data row also.
     bZeroIndexed = (typeof bZeroIndexed === 'undefined') ? false : bZeroIndexed;
 
-    var shift = bZeroIndexed ? -1 : 0;
-
     var arraySelected = [];
     var rawTables = kawasu.microtable.getRawTables(sTableId);
     var nodeListLength = rawTables.children.length;
@@ -1345,7 +1578,16 @@ kawasu.microtable.getSelectedIndices = function (sTableId, bZeroIndexed) {
         var table = rawTables.children[i];
         var checkbox = kawasu.microtable.getCheckboxFromTable(table);
         if (checkbox.checked) {
-            arraySelected.push(i + shift);
+            if (bZeroIndexed) {
+                // Get the arrData index number and put that in the array
+                var dataIndex = kawasu.microtable.getDataIndexFromTable(table);
+                arraySelected.push(dataIndex);
+            }
+            else {
+                // Get the table position index number and put that in the array
+                arraySelected.push(i);
+            }
+
         }
     }
 
@@ -1355,7 +1597,7 @@ kawasu.microtable.getSelectedIndices = function (sTableId, bZeroIndexed) {
     return arraySelected;
 }
 
-kawasu.microtable.addRow = function (sTableId, table, bHeader, sCell1Text, sCell2Text) {
+kawasu.microtable.addRow = function (sTableId, table, bHeader, iDataIndex, sCell1Text, sCell2Text) {
     //var prefix = "kawasu.microtable.addRow() - ";
     //console.log(prefix + "Entering");
 
@@ -1377,9 +1619,14 @@ kawasu.microtable.addRow = function (sTableId, table, bHeader, sCell1Text, sCell
     var arraySplit = tableId.split("_");
     var sTableIndex = arraySplit[1]; // [0]=sTableId,[1]="000000" etc
     var nCurrentRowCount = table.children.length; // Next index is this value
-    var sCurrentRowCount = fc.utils.prePad(nCurrentRowCount.toString(),"0",4);
+    var sCurrentRowCount = fc.utils.prePad(nCurrentRowCount.toString(), "0", 4);
 
-    var sRowId = sTableId + "_" + sTableIndex + "_" + "tr" + "_" + sCurrentRowCount;
+    var sDataIndex = "";
+    if (iDataIndex >= 0) {
+        var sDataIndex = fc.utils.prePad(iDataIndex.toString(), "0", 6)
+    }
+
+    var sRowId = kawasu.microtable.getRowName(sTableId, sTableIndex, sCurrentRowCount, sDataIndex);
     var sCell1Id = sRowId + "_" + cellType + "1";
     var sCell2Id = sRowId + "_" + cellType + "2";
 
@@ -1423,6 +1670,33 @@ kawasu.microtable.addRow = function (sTableId, table, bHeader, sCell1Text, sCell
     return tr;
 }
 
+kawasu.microtable.getRowName = function (sTableId, sTableIndex, sCurrentRowCount, sDataIndex) {
+    return  sTableId + "_" +
+            sTableIndex + "_" +
+            "tr" + "_" +
+            sCurrentRowCount + "_" +
+            sDataIndex;
+}
+
+kawasu.microtable.getDataIndexFromRowName = function (row) {
+    var prefix = "kawasu.microtable.getDataIndexFromRowName() - ";
+    var rowId = row.id;
+    var sArraySplit = rowId.split("_");
+
+    if (sArraySplit.length < 5) {
+        console.log(prefix + "ERROR: Row name >" + rowId + "< does not split to at least 5 elements, cannot find data index value.");
+        return -1;
+    }
+
+    try {
+        return parseInt(sArraySplit[4], 10);
+    }
+    catch (error) {
+        console.log(prefix + "ERROR: Failed to convert string >" + sArraySplit[4] + "< to integer: " + error);
+    }
+    
+    return -1;
+}
 
 kawasu.microtable.getTableSize = function (rawTables) {
     var prefix = "kawasu.microtable.getTableSize() - ";
@@ -1457,6 +1731,112 @@ kawasu.microtable.getTableSize = function (rawTables) {
     return size;
 }
 
+kawasu.microtable.isKeyNumeric = function (sTableId, n) {
+    var prefix = "kawasu.microtable.isKeyNumeric() - ";
+    console.log(prefix + "Entering");
+
+    var bKeyIsNumeric = false;
+    var bAllValuesAreNull = true;
+
+    // Iterate the tables
+    var rawTables = kawasu.microtable.getRawTables(sTableId);
+    var nodeListLength = rawTables.children.length;
+
+    for (var i = 1; i < nodeListLength; ++i) {
+        var table = rawTables.children[i];
+        var row = table.rows[n];
+        var textval = fc.utils.textContent(row.cells[1]);
+        if (textval != null && textval != "") {
+            var nValue = new Number(textval);
+            if (isNaN(nValue)) {
+                console.log(prefix + "Exiting [NON NUMERIC VALUE]: returning FALSE");
+                return false;
+            }
+            else {
+                bAllValuesAreNull = false;
+            }
+        }
+    }
+
+    if (bAllValuesAreNull) {
+        console.log(prefix + "Exiting [ALL NULL]: returning FALSE");
+        return false;
+    }
+
+    console.log(prefix + "Exiting [SUCCESS]: returning TRUE");
+    return true;
+}
+
+kawasu.microtable.getTableIdFromIndexCurrentRow = function (sTableId, indexCurrentRow) {
+    var prefix = "kawasu.microtable.getTableIdFromIndexCurrentRow() - ";
+    console.log(prefix + "Entering");
+
+    // Return the id of the rowTable at the current index
+
+    var rawTables = kawasu.microtable.getRawTables(sTableId);
+    return rawTables.children[indexCurrentRow].id;
+
+    console.log(prefix + "Exiting");
+}
+
+/*
+kawasu.microtable.getTableIndexFromTable = function (table) {
+    var prefix = "kawasu.microtable.getTableIndexFromTable() - ";
+    console.log(prefix + "Entering");
+
+    var arraySplit = (table.id).split("_");
+
+    // Example ID: "myMicroTable_00005"
+    // arraySplit[0] == user defined name of table (common to all tables, aka sTableId)
+    // arraySplit[1] == 1-based index of table when it was built
+
+    var tableIndex = parseInt(arraySplit[1], 10);
+
+    console.log(prefix + "Exiting");
+    return tableIndex;
+}
+*/
+
+kawasu.microtable.getDataIndexFromTable = function (table) {
+    var prefix = "kawasu.microtable.getDataIndexFromTable() - ";
+    console.log(prefix + "Entering");
+
+    // Rows have id's that encode the index in the data array used to create them
+    // Example ID: "myMicroTable_000005_tr_0000_000004"
+    // Format:      sTableId_TableIndex_tr_RowIndex_DataIndex
+
+    var row = table.rows[0];
+    var arraySplit = (row.id).split("_");
+
+    var dataIndex = parseInt(arraySplit[4], 10);
+
+    console.log(prefix + "Exiting");
+    return dataIndex;
+}
+
+kawasu.microtable.getIndexByKeyName = function (sTableId, sKeyName) {
+    var prefix = "kawasu.microtable.getIndexByKeyName() - ";
+    console.log(prefix + "Entering");
+
+    // Return the Key-Value pair's row index number for a given key
+
+    var rawTables = kawasu.microtable.getRawTables(sTableId);
+    var nodeListLength = rawTables.children.length;
+    for (var i = 1; i < nodeListLength; ++i) {
+        var table = rawTables.children[i];
+        for (var j = 0; j < table.rows.length; ++j) {
+            var cellKey = table.rows[j].cells[0];
+            var textval = fc.utils.textContent(cellKey);
+            if (textval == sKeyName) {
+                return j;
+            }
+        }
+    }
+
+
+    console.log(prefix + "Exiting");
+    return -1;
+}
 
 //
 ////////////////////////////////////////////////////////////////////////////////
