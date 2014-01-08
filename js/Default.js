@@ -194,7 +194,7 @@ kawasu.orders.createTestDataB = function () {
         "Contract": "NUBBIN",
         "Side": "SELL",
         "Comment": "No comment",
-        "Qty": "7",
+        "Qty": 0, // Numeric zero evaluates to false
         "Price": "101.32"
     };
 

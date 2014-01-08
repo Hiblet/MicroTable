@@ -33,7 +33,7 @@ kawasu.microtable.config.VERTICAL = 0;
 kawasu.microtable.config.nZeroPadding = 6;
 
 // Constant 
-kawasu.microtable.config.sEmptyStringHtml = "&nbsp;";
+kawasu.microtable.config.sEmptyStringHtml = "&nbsp";
 
 // Div Wrapper for return
 kawasu.microtable.config.sDivOuterPrefix = "div_";
@@ -1597,7 +1597,7 @@ kawasu.microtable.getSelectedIndices = function (sTableId, bZeroIndexed) {
     return arraySelected;
 }
 
-kawasu.microtable.addRow = function (sTableId, table, bHeader, iDataIndex, sCell1Text, sCell2Text) {
+kawasu.microtable.addRow = function (sTableId, table, bHeader, iDataIndex, cell1, cell2) {
     //var prefix = "kawasu.microtable.addRow() - ";
     //console.log(prefix + "Entering");
 
@@ -1639,26 +1639,18 @@ kawasu.microtable.addRow = function (sTableId, table, bHeader, iDataIndex, sCell
     var cellCol1Class = (bHeader ? classHeaderCell : classCellKey) + " " + classCol1;
     cellCol1.className = cellCol1Class;
     cellCol1.id = sCell1Id;
-    if (typeof sCell1Text === 'undefined' || fc.utils.isEmptyStringOrWhiteSpace(sCell1Text)) {
-        cellCol1.innerHTML = kawasu.microtable.config.sEmptyStringHtml;
-    }
-    else {
-        fc.utils.textContent(cellCol1, sCell1Text);
-    }
+    var sCell1 = kawasu.microtable.getTdElementContent(cell1);
+    cellCol1.innerHTML = sCell1;
 
     // Second column cell
     var cellCol2 = document.createElement(cellType);
     var cellCol2Class = (bHeader ? classHeaderCell : classCellValue)
     cellCol2.className = cellCol2Class;
     cellCol2.id = sCell2Id;
-    if (typeof sCell2Text === 'undefined' || fc.utils.isEmptyStringOrWhiteSpace(sCell2Text)) {
-        cellCol2.innerHTML = kawasu.microtable.config.sEmptyStringHtml;
-    }
-    else {
-        fc.utils.textContent(cellCol2, sCell2Text);
-        if (bHeader == false) {
-            cellCol2.title = sCell2Text;  // If this is a data row, value cell, make the tooltip the data too
-        }
+    var sCell2 = kawasu.microtable.getTdElementContent(cell2);
+    cellCol2.innerHTML = sCell2;
+    if (bHeader == false && !fc.utils.isEmptyStringOrWhiteSpace(sCell2)) {
+        cellCol2.title = sCell2;  // If this is a data row, value cell, make the tooltip the data too
     }
 
     tr.appendChild(cellCol1);
@@ -1668,6 +1660,26 @@ kawasu.microtable.addRow = function (sTableId, table, bHeader, iDataIndex, sCell
     //console.log(prefix + "Exiting");
 
     return tr;
+}
+
+kawasu.microtable.getTdElementContent = function (arg) {
+    // Take a variable and return a sensible string to show in the table
+
+    if (typeof arg === 'undefined' || arg == null) {
+        return kawasu.microtable.config.sEmptyStringHtml;
+    }
+
+    if (typeof arg == 'string' || arg instanceof String) {
+        if (fc.utils.isEmptyStringOrWhiteSpace(arg)) {
+            return kawasu.microtable.config.sEmptyStringHtml; // Empty string, replace with nbsp
+        }
+        else {
+            return arg; // Not empty, not a string, send it back unchanged
+        }
+    }
+
+    // Not a string, not undefined and not null, try to convert to string and return...
+    return arg.toString();
 }
 
 kawasu.microtable.getRowName = function (sTableId, sTableIndex, sCurrentRowCount, sDataIndex) {
