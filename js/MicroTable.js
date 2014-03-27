@@ -175,7 +175,7 @@ kawasu.microtable.buildRawTables = function (sTableId) {
     labelRowNavigate.title = kawasu.microtable.getLabelTooltip(sItemName, arrData.length);
     th1Control.appendChild(labelRowNavigate);
     var textboxRowNavigate = document.createElement("input");
-    textboxRowNavigate.type = "textbox";
+    textboxRowNavigate.setAttribute("type", "textbox");
     textboxRowNavigate.id = sTableId + "_" + "textboxRowNavigate";
     textboxRowNavigate.value = (kawasu.microtable[sTableId]["indexCurrentRow"]);
     textboxRowNavigate.className = classTextboxRowNavigate;
@@ -193,7 +193,7 @@ kawasu.microtable.buildRawTables = function (sTableId) {
 
     // First Row Button
     var btnRowFirst = document.createElement("input");
-    btnRowFirst.type = "button";
+    btnRowFirst.setAttribute("type", "button");
     btnRowFirst.id = sTableId + "_" + "btnRowFirst";
     btnRowFirst.value = "<<";
     btnRowFirst.title = "First";
@@ -203,7 +203,7 @@ kawasu.microtable.buildRawTables = function (sTableId) {
 
     // Previous Row Button
     var btnRowPrev = document.createElement("input");
-    btnRowPrev.type = "button";
+    btnRowPrev.setAttribute("type", "button");
     btnRowPrev.id = sTableId + "_" + "btnRowPrev";
     btnRowPrev.value = "<";
     btnRowPrev.title = "Previous";
@@ -213,7 +213,7 @@ kawasu.microtable.buildRawTables = function (sTableId) {
 
     // Next Row Button
     var btnRowNext = document.createElement("input");
-    btnRowNext.type = "button";
+    btnRowNext.setAttribute("type", "button");
     btnRowNext.id = sTableId + "_" + "btnRowNext";
     btnRowNext.value = ">";
     btnRowNext.title = "Next";
@@ -223,7 +223,7 @@ kawasu.microtable.buildRawTables = function (sTableId) {
 
     // Last Row Button
     var btnRowLast = document.createElement("input");
-    btnRowLast.type = "button";
+    btnRowLast.setAttribute("type", "button");
     btnRowLast.id = sTableId + "_" + "btnRowLast";
     btnRowLast.value = ">>";
     btnRowLast.title = "Last";
@@ -233,7 +233,7 @@ kawasu.microtable.buildRawTables = function (sTableId) {
 
     // Select Checkbox
     var checkboxControlSelect = document.createElement("input");
-    checkboxControlSelect.type = "checkbox";
+    checkboxControlSelect.setAttribute("type", "checkbox");
     checkboxControlSelect.id = sTableId + "_" + "checkboxSelect";
     checkboxControlSelect.title = "Select";
     checkboxControlSelect.className = classCheckboxSelect;
@@ -283,7 +283,7 @@ kawasu.microtable.buildRawTables = function (sTableId) {
 
         // Add a checkbox to the native header 2nd cell
         var checkboxSelect = document.createElement("input");
-        checkboxSelect.type = "checkbox";
+        checkboxSelect.setAttribute("type", "checkbox");
         checkboxSelect.id = table.id + "_" + "checkboxSelect";
         checkboxSelect.className = classCheckboxSelect;
         fc.utils.addEvent(checkboxSelect, "click", kawasu.microtable.checkboxSelect_onClick);
@@ -417,11 +417,12 @@ kawasu.microtable.setViewStateStack = function (sTableId, rawTables, indexCurren
     // Hide the row's native header
     // Set the control select checkbox to match the underlying rowTable checkbox
 
-    var tableControl = rawTables.children[0];
+    var rawTablesChildren = $(rawTables).children();
+    var nodeListLength = rawTablesChildren.length;
+    var tableControl = rawTablesChildren[0];
     var controlCheckbox = kawasu.microtable.getCheckboxFromTable(tableControl);
     kawasu.microtable.elementVis(tableControl, true);
 
-    var nodeListLength = rawTables.children.length;
 
     // Ensure that the current row is legal and up to date
     if (kawasu.microtable[sTableId]["indexCurrentRow"] > (nodeListLength - 1)) {
@@ -465,7 +466,7 @@ kawasu.microtable.setViewStateStack = function (sTableId, rawTables, indexCurren
 
     // Show the data 
     for (var i = 1; i < nodeListLength; ++i) {
-        var table = rawTables.children[i];
+        var table = rawTablesChildren[i];
         if (i == indexCurrentRow) {
             kawasu.microtable.elementVis(table.rows[0], false); // Hide native header
             for (var j = 1; j < table.rows.length; ++j) {
@@ -496,8 +497,9 @@ kawasu.microtable.setViewStateVertical = function (sTableId, rawTables, indexCur
     var bExpandable = kawasu.microtable[sTableId]["bExpandable"];
     var bMultiExpand = kawasu.microtable[sTableId]["bMultiExpand"];
 
-    var tableControl = rawTables.children[0];
-    var nodeListLength = rawTables.children.length;
+    var rawTablesChildren = $(rawTables).children();
+    var nodeListLength = rawTablesChildren.length;
+    var tableControl = rawTablesChildren[0];
 
 
     // Special Case: No data to show
@@ -522,7 +524,7 @@ kawasu.microtable.setViewStateVertical = function (sTableId, rawTables, indexCur
     kawasu.microtable.elementVis(tableControl, false);
 
     for (var i = 1; i < nodeListLength; ++i) {
-        var table = rawTables.children[i];
+        var table = rawTablesChildren[i];
         if (bExpandable) {
             kawasu.microtable.tableExpansionState(table, (i == indexCurrentRow)); // Show rows only for current rowTable
         }
@@ -531,7 +533,6 @@ kawasu.microtable.setViewStateVertical = function (sTableId, rawTables, indexCur
         }
         kawasu.microtable.elementVis(table, true); // Show table
     }
-
 
     console.log(prefix + "Exiting");
 }
@@ -598,7 +599,8 @@ kawasu.microtable.textboxRowNavigate_onChange = function (event) {
     var tableControlId = kawasu.microtable.getTableId(sTableId, 0);
     var tableControl = document.getElementById(tableControlId);
     var rawTables = tableControl.parentNode;
-    var rawTablesLength = rawTables.children.length;
+    var rawTablesChildren = $(rawTables).children();
+    var rawTablesLength = rawTablesChildren.length;
 
     var nCleanValue = nValue;
     if (nValue < 1) {
@@ -643,7 +645,8 @@ kawasu.microtable.btnRowNavigate_onClick = function () {
     var tableControlId = kawasu.microtable.getTableId(sTableId, 0);
     var tableControl = document.getElementById(tableControlId);
     var rawTables = tableControl.parentNode;
-    var rawTablesLength = rawTables.children.length;
+    var rawTablesChildren = $(rawTables).children();
+    var rawTablesLength = rawTablesChildren.length;
 
     var indexCurrentRow = kawasu.microtable[sTableId]["indexCurrentRow"];
 
@@ -844,7 +847,8 @@ kawasu.microtable.itemsDelete = function (sTableId, arrRowsToDelete, bDeleteSour
     bDeleteSourceData = typeof bDeleteSourceData !== 'undefined' ? bDeleteSourceData : false;
 
     var rawTables = kawasu.microtable.getRawTables(sTableId);
-    var nodeListLength = rawTables.children.length;
+    var rawTablesChildren = $(rawTables).children();
+    var nodeListLength = rawTablesChildren.length;
     var indexCurrentRow = kawasu.microtable[sTableId]["indexCurrentRow"];
     var arrData = kawasu.microtable[sTableId]["arrData"];
 
@@ -870,13 +874,10 @@ kawasu.microtable.itemsDelete = function (sTableId, arrRowsToDelete, bDeleteSour
 
     var arrDataIndicesToDelete = [];
     for (var i = arrRowsToDelete.length - 1; i >= 0; --i) {
-        
-        //var tableToDeleteId = kawasu.microtable.getTableId(sTableId, arrRowsToDelete[index]);
-        //var tableToDelete = document.getElementById(tableToDeleteId);
-        var tableToDelete = rawTables.children[(arrRowsToDelete[i])]; // Delete by position
+
+        var tableToDelete = rawTablesChildren[(arrRowsToDelete[i])]; // Delete by position
 
         if (bDeleteSourceData) {
-            //arrData.splice(arrRowsToDelete[index] - 1, 1); // Converting from a visual row index to data index, sub 1
             var row1 = tableToDelete.rows[1]; // rows[0] is the native header, get first row after this
             var iDataIndex = kawasu.microtable.getDataIndexFromRowName(row1);
             arrDataIndicesToDelete.push(iDataIndex);
@@ -897,9 +898,10 @@ kawasu.microtable.itemsDelete = function (sTableId, arrRowsToDelete, bDeleteSour
     else {
 
         // Rename the remaining tables so that navigation still works
-        nodeListLength = rawTables.children.length;
+
+        nodeListLength = rawTablesChildren.length;
         for (var i = 1; i < nodeListLength; ++i) {
-            var table = rawTables.children[i];
+            var table = rawTablesChildren[i];
             table.id = kawasu.microtable.getTableId(sTableId, i);
             var th1 = table.rows[0].cells[0];
             var sItemName = kawasu.microtable[sTableId]["sItemName"];
@@ -948,13 +950,14 @@ kawasu.microtable.setSelectAll = function (sTableId, bSelect) {
     }
 
     var rawTables = kawasu.microtable.getRawTables(sTableId);
-    var nodeListLength = rawTables.children.length;
+    var rawTablesChildren = $(rawTables).children();
+    var nodeListLength = rawTablesChildren.length;
 
     // Iterate tables, set select state.  
     // Note: Control table case is handled by intelligence in getCheckboxFromTable()
     //       because this fn is able to retrieve the checkbox from the control table too.
     for (var i = 0; i < nodeListLength; ++i) {
-        var table = rawTables.children[i];
+        var table = rawTablesChildren[i];
         var checkbox = kawasu.microtable.getCheckboxFromTable(table);
         checkbox.checked = bSelect;
     }
@@ -1080,9 +1083,10 @@ kawasu.microtable.sortrows = function (sTableId, n, comparator) {
     // Create an array of tables to sort
     var arrayRowTables = [];
     var rawTables = kawasu.microtable.getRawTables(sTableId);
-    var nodeListLength = rawTables.children.length;
+    var rawTablesChildren = $(rawTables).children();
+    var nodeListLength = rawTablesChildren.length;
     for (var i = 1; i < nodeListLength; ++i) {
-        arrayRowTables.push(rawTables.children[i]);
+        arrayRowTables.push(rawTablesChildren[i]);
     }
 
     arrayRowTables.sort(function (rowTable1, rowTable2) {
@@ -1118,7 +1122,7 @@ kawasu.microtable.sortrows = function (sTableId, n, comparator) {
     // Append the rows under rawTables in the order of the array
     for (var i = 0; i < arrayRowTables.length; ++i) {
         var tableCurrent = arrayRowTables[i];
-        
+
         if (tableCurrent.id == tableTargetId) {
             // This table is the current one showing, but it's position has changed,
             // so the current index has also changed.
@@ -1128,7 +1132,7 @@ kawasu.microtable.sortrows = function (sTableId, n, comparator) {
         // Reset the item number identifier to reflect current order
         var th1 = tableCurrent.rows[0].cells[0];
         var sItemName = kawasu.microtable[sTableId]["sItemName"];
-        fc.utils.textContent(th1, kawasu.microtable.getItemText(sItemName, i+1));
+        fc.utils.textContent(th1, kawasu.microtable.getItemText(sItemName, i + 1));
 
         rawTables.appendChild(tableCurrent);
     }
@@ -1154,9 +1158,11 @@ kawasu.microtable.makeKeysSortable = function (sTableId, rawTables) {
     // Attach a function to the Key cell's onclick event to trigger sorting.
 
     // Iterate the rowTables
-    var nodeListLength = rawTables.children.length;
+    var rawTablesChildren = $(rawTables).children();
+    var nodeListLength = rawTablesChildren.length;
+
     for (var i = 1; i < nodeListLength; ++i) {
-        var table = rawTables.children[i];
+        var table = rawTablesChildren[i];
 
         // Iterate the rows of each rowTable
         for (var j = 1; j < table.rows.length; ++j) {
@@ -1263,9 +1269,10 @@ kawasu.microtable.getRowTables = function (sTableId, sKey, sValue) {
     var arrayRowTables = [];
 
     var rawTables = kawasu.microtable.getRawTables(sTableId);
-    var nodeListLength = rawTables.children.length;
+    var rawTablesChildren = $(rawTables).children();
+    var nodeListLength = rawTablesChildren.length;
     for (var i = 0; i < nodeListLength; ++i) {
-        var table = rawTables.children[i];
+        var table = rawTablesChildren[i];
         var row = table.rows[iRow]; // Key row
         var cell = row.cells[1]; // Value cell
         if (sValue == fc.utils.textContent(cell)) {
@@ -1306,10 +1313,10 @@ kawasu.microtable.applySingleExpand = function (sTableId) {
     var indexCurrentRow = kawasu.microtable[sTableId]["indexCurrentRow"];
     var tableTargetId = kawasu.microtable.getTableId(sTableId, indexCurrentRow);
     var rawTables = kawasu.microtable.getRawTables(sTableId);
-
-    var nodeListLength = rawTables.children.length;
+    var rawTablesChildren = $(rawTables).children();
+    var nodeListLength = rawTablesChildren.length;
     for (var i = 0; i < nodeListLength; ++i) {
-        var table = rawTables.children[i];
+        var table = rawTablesChildren[i];
         kawasu.microtable.tableExpansionState(table, (table.id == tableTargetId));
     }
     console.log(prefix + "Exiting");
@@ -1346,9 +1353,10 @@ kawasu.microtable.tableExpansionState = function (table, bExpansionState) {
         // Iterate the rows of the table.
         // If the row contains td elements, set the row to the given show state
         var bIsControlTable = kawasu.microtable.isControlTable(table);
-        var nodeListLength = table.children.length;
+        var tableChildren = $(table).children();
+        var nodeListLength = tableChildren.length;
         for (var i = 0; i < nodeListLength; ++i) {
-            var row = table.children[i];
+            var row = tableChildren[i];
             var cell = row.cells[0];
             if (cell.nodeName == 'TD') {
                 // Data rows
@@ -1454,13 +1462,15 @@ kawasu.microtable.getRawTables = function (sTableId) {
 kawasu.microtable.setLabelTooltipRowCount = function (sTableId) {
     // Work out how many data rows there are, and set the tooltip accordingly
     var rawTables = kawasu.microtable.getRawTables(sTableId);
-    var tableControl = rawTables.children[0];
+    var rawTablesChildren = $(rawTables).children();
+    var tableControl = rawTablesChildren[0];
     var tr = tableControl.rows[0];
     var th1 = tr.cells[0];
-    var label = th1.children[0];
+    var th1Children = $(th1).children();
+    var label = th1Children[0];
 
     var sItemName = kawasu.microtable[sTableId]["sItemName"];
-    var nDataRows = rawTables.children.length - 1;
+    var nDataRows = rawTablesChildren.length - 1;
 
     label.title = kawasu.microtable.getLabelTooltip(sItemName, nDataRows);
 }
@@ -1495,7 +1505,8 @@ kawasu.microtable.getTextboxFromTable = function (table) {
     // Textbox is only on the control table, which is passed
     var tr = table.rows[0]; // First row of control table
     var cell = tr.cells[0]; // First cell of first row
-    var textbox = cell.children[1]; // 2nd element of this cell
+    var cellChildren = $(cell).children();
+    var textbox = cellChildren[1]; // 2nd element of this cell
     return textbox;
 }
 
@@ -1513,14 +1524,15 @@ kawasu.microtable.getCheckboxFromTable = function (table) {
     var zeroIndex = parseInt(arraySplit[1]);
     var checkboxId = "";
 
+    var cell1Children = $(table.rows[0].cells[1]).children();
     if (zeroIndex == 0) {
         // Control
-        var checkbox = table.rows[0].cells[1].children[4]; // 5th control
+        var checkbox = cell1Children[4]; // 5th control
         return checkbox;
     }
     else {
         // Row
-        var checkbox = table.rows[0].cells[1].children[0]; // 1st control
+        var checkbox = cell1Children[0]; // 1st control
         return checkbox;
     }
 }
@@ -1530,7 +1542,8 @@ kawasu.microtable.pushSelectStateControlToRow = function (sTableId, nSelectedInd
     console.log(prefix + "Entering");
 
     var rawTables = kawasu.microtable.getRawTables(sTableId);
-    var table = rawTables.children[nSelectedIndex];
+    var rawTablesChildren = $(rawTables).children();
+    var table = rawTablesChildren[nSelectedIndex];
     var checkbox = kawasu.microtable.getCheckboxFromTable(table);
     checkbox.checked = bState;
 
@@ -1545,11 +1558,12 @@ kawasu.microtable.setSingleSelect = function (sTableId, nSelectedIndex) {
     // mode, so set the other rowTables to not selected.
 
     var rawTables = kawasu.microtable.getRawTables(sTableId);
-    var nodeListLength = rawTables.children.length;
+    var rawTablesChildren = $(rawTables).children();
+    var nodeListLength = rawTablesChildren.length;
 
     // Single Select
     for (var i = 1; i < nodeListLength; ++i) {
-        var table = rawTables.children[i];
+        var table = rawTablesChildren[i];
         var checkbox = kawasu.microtable.getCheckboxFromTable(table);
         if (i == nSelectedIndex) {
             checkbox.checked = true;
@@ -1572,10 +1586,11 @@ kawasu.microtable.getSelectedIndices = function (sTableId, bZeroIndexed) {
 
     var arraySelected = [];
     var rawTables = kawasu.microtable.getRawTables(sTableId);
-    var nodeListLength = rawTables.children.length;
+    var rawTablesChildren = $(rawTables).children();
+    var nodeListLength = rawTablesChildren.length;
 
     for (var i = 1; i < nodeListLength; ++i) {
-        var table = rawTables.children[i];
+        var table = rawTablesChildren[i];
         var checkbox = kawasu.microtable.getCheckboxFromTable(table);
         if (checkbox.checked) {
             if (bZeroIndexed) {
@@ -1618,7 +1633,8 @@ kawasu.microtable.addRow = function (sTableId, table, bHeader, iDataIndex, cell1
     var tableId = table.id;
     var arraySplit = tableId.split("_");
     var sTableIndex = arraySplit[1]; // [0]=sTableId,[1]="000000" etc
-    var nCurrentRowCount = table.children.length; // Next index is this value
+    var tableChildren = $(table).children();
+    var nCurrentRowCount = tableChildren.length; // Next index is this value
     var sCurrentRowCount = fc.utils.prePad(nCurrentRowCount.toString(), "0", 4);
 
     var sDataIndex = "";
@@ -1714,7 +1730,8 @@ kawasu.microtable.getTableSize = function (rawTables) {
     var prefix = "kawasu.microtable.getTableSize() - ";
     console.log(prefix + "Entering");
 
-    var cloneControlTable = rawTables.children[0].cloneNode(true);
+    var rawTablesChildren = $(rawTables).children();
+    var cloneControlTable = rawTablesChildren[0].cloneNode(true);
     cloneControlTable.style.width = "auto";
 
     var size = new Object();
@@ -1752,10 +1769,12 @@ kawasu.microtable.isKeyNumeric = function (sTableId, n) {
 
     // Iterate the tables
     var rawTables = kawasu.microtable.getRawTables(sTableId);
-    var nodeListLength = rawTables.children.length;
+    var rawTablesChildren = $(rawTables).children();
+    var nodeListLength = rawTablesChildren.length;
+
 
     for (var i = 1; i < nodeListLength; ++i) {
-        var table = rawTables.children[i];
+        var table = rawTablesChildren[i];
         var row = table.rows[n];
         var textval = fc.utils.textContent(row.cells[1]);
         if (textval != null && textval != "") {
@@ -1786,28 +1805,12 @@ kawasu.microtable.getTableIdFromIndexCurrentRow = function (sTableId, indexCurre
     // Return the id of the rowTable at the current index
 
     var rawTables = kawasu.microtable.getRawTables(sTableId);
-    return rawTables.children[indexCurrentRow].id;
+    var rawTablesChildren = $(rawTables).children();
+    return rawTablesChildren[indexCurrentRow].id;
 
     console.log(prefix + "Exiting");
 }
 
-/*
-kawasu.microtable.getTableIndexFromTable = function (table) {
-    var prefix = "kawasu.microtable.getTableIndexFromTable() - ";
-    console.log(prefix + "Entering");
-
-    var arraySplit = (table.id).split("_");
-
-    // Example ID: "myMicroTable_00005"
-    // arraySplit[0] == user defined name of table (common to all tables, aka sTableId)
-    // arraySplit[1] == 1-based index of table when it was built
-
-    var tableIndex = parseInt(arraySplit[1], 10);
-
-    console.log(prefix + "Exiting");
-    return tableIndex;
-}
-*/
 
 kawasu.microtable.getDataIndexFromTable = function (table) {
     var prefix = "kawasu.microtable.getDataIndexFromTable() - ";
@@ -1833,9 +1836,10 @@ kawasu.microtable.getIndexByKeyName = function (sTableId, sKeyName) {
     // Return the Key-Value pair's row index number for a given key
 
     var rawTables = kawasu.microtable.getRawTables(sTableId);
-    var nodeListLength = rawTables.children.length;
+    var rawTablesChildren = $(rawTables).children();
+    var nodeListLength = rawTablesChildren.length;
     for (var i = 1; i < nodeListLength; ++i) {
-        var table = rawTables.children[i];
+        var table = rawTablesChildren[i];
         for (var j = 0; j < table.rows.length; ++j) {
             var cellKey = table.rows[j].cells[0];
             var textval = fc.utils.textContent(cellKey);
