@@ -131,9 +131,8 @@ kawasu.orders.createZeroTestData = function () {
 
     array.push(obj1);
 
-    return array;
-
     console.log(prefix + "Exiting");
+    return array;
 }
 
 
@@ -171,9 +170,8 @@ kawasu.orders.createTestDataA = function () {
     array.push(obj2);
     array.push(obj3);
 
-    return array;
-
     console.log(prefix + "Exiting");
+    return array;
 }
 
 kawasu.orders.createTestDataB = function () {
@@ -237,9 +235,8 @@ kawasu.orders.createTestDataB = function () {
     array.push(obj5);
     array.push(obj6);
 
-    return array;
-
     console.log(prefix + "Exiting");
+    return array;
 }
 
 
@@ -260,9 +257,8 @@ kawasu.orders.createTestDataLargeRandom = function () {
         array.push(obj);
     }
 
-    return array;
-
     console.log(prefix + "Exiting");
+    return array;
 }
 
 
